@@ -232,13 +232,13 @@ create policy authenticated_insert_activity_logs on public.activity_logs
 -- update/delete: TIDAK ADA untuk role manapun, termasuk mpm
 -- ============ STORAGE: dokumentasi-kegiatan + logo ============
 -- read: publik (bucket public).
--- write/update/delete: hanya pemilik folder pertama = auth.uid()
--- CATATAN: policy insert/update/delete HARUS gabungan kedua bucket dalam satu policy —
--- policy per-bucket saling menolak (semua with check harus lulus utk insert).
--- path: <uid>/<subfolder>/... (foldername index 1 = uid, array Postgres mulai dari 1)
 drop policy if exists dokumentasi_public_read on storage.objects;
 create policy dokumentasi_public_read on storage.objects
   for select using (bucket_id = 'dokumentasi-kegiatan');
+
+drop policy if exists logo_public_read on storage.objects;
+create policy logo_public_read on storage.objects
+  for select using (bucket_id = 'logo');
 
 drop policy if exists dokumentasi_auth_write on storage.objects;
 drop policy if exists dokumentasi_own_write on storage.objects;
