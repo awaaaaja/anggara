@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { getCurrentProfile } from "@/lib/auth/get-current-profile";
 import { getOrmawaTahunOptions, listProposalsOrmawa } from "@/lib/db/queries/ormawa";
+import { PdfPreviewDialog } from "@/components/shared/PdfPreviewDialog";
 import { HistoryFilter } from "@/components/ormawa/HistoryFilter";
 import { OrmawaNav } from "@/components/shared/OrmawaNav";
 import { StatusBadge } from "@/components/shared/StatusBadge";
@@ -90,6 +91,11 @@ export default async function OrmawaProposalsPage({
                       {p.judul_kegiatan}
                     </Link>
                     <p className="text-xs text-muted-foreground">Versi {p.versi_revisi + 1}</p>
+                    {p.file_proposal_url && (
+                      <div className="mt-1">
+                        <PdfPreviewDialog url={p.file_proposal_url} label="Lihat PDF" />
+                      </div>
+                    )}
                   </TableCell>
                   <TableCell className="text-sm whitespace-nowrap text-muted-foreground">
                     {TANGGAL.format(new Date(p.tanggal_mulai))} — {TANGGAL.format(new Date(p.tanggal_selesai))}

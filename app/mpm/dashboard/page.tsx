@@ -1,20 +1,25 @@
 import { getMpmSummary } from "@/lib/db/queries/mpm";
 import { applyAutoStatusTransitions } from "@/lib/db/queries/status-auto";
-import { TabNav } from "@/components/shared/TabNav";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { RUPIAH, STATUS_PROPOSAL_LABEL } from "@/lib/constants";
-import { AnggaranPerOrmawaChart } from "@/components/mpm/AnggaranPerOrmawaChart";
+import nextDynamic from "next/dynamic";
+import { MpmNav } from "@/components/shared/MpmNav";
+
+const AnggaranPerOrmawaChart = nextDynamic(
+  () => import("@/components/mpm/AnggaranPerOrmawaChart").then((m) => m.AnggaranPerOrmawaChart),
+  { ssr: false },
+);
 
 const STATUS_COLOR: Record<string, string> = {
-  draft: "text-zinc-600",
-  diajukan: "text-amber-600",
-  revisi_diminta: "text-orange-600",
-  ditolak: "text-red-600",
-  disetujui: "text-emerald-600",
-  kegiatan_berlangsung: "text-sky-600",
-  lpj_menunggu: "text-violet-600",
-  lpj_direview: "text-blue-600",
-  selesai: "text-green-600",
+  draft: "text-zinc-600 dark:text-zinc-400",
+  diajukan: "text-amber-700 dark:text-amber-400",
+  revisi_diminta: "text-orange-700 dark:text-orange-400",
+  ditolak: "text-red-700 dark:text-red-400",
+  disetujui: "text-emerald-700 dark:text-emerald-400",
+  kegiatan_berlangsung: "text-sky-700 dark:text-sky-400",
+  lpj_menunggu: "text-violet-700 dark:text-violet-400",
+  lpj_direview: "text-blue-700 dark:text-blue-400",
+  selesai: "text-green-700 dark:text-green-400",
 };
 
 export const dynamic = "force-dynamic";
@@ -36,15 +41,7 @@ export default async function MpmDashboardPage() {
         <p className="mt-1 text-sm text-muted-foreground">Posisi terakhir seluruh kegiatan ormawa.</p>
       </div>
 
-      <TabNav
-        items={[
-          { href: "/mpm/dashboard", label: "Ringkasan", active: true },
-          { href: "/mpm/proposals", label: "Proposal" },
-          { href: "/mpm/lpj", label: "LPJ" },
-          { href: "/mpm/ormawa", label: "Ormawa" },
-          { href: "/mpm/activity-log", label: "Log aktivitas" },
-        ]}
-      />
+      <MpmNav active="ringkasan" />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {stats.map((s) => (

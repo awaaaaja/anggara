@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { listActivityActors, listActivityLogs } from "@/lib/db/queries/mpm";
-import { TabNav } from "@/components/shared/TabNav";
 import { Button } from "@/components/ui/button";
 import { ActivityLogFilters } from "@/components/mpm/ActivityLogFilters";
 import {
@@ -11,25 +10,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { TANGGAL } from "@/lib/constants";
+import { ACTION_LABEL, TANGGAL } from "@/lib/constants";
+import { MpmNav } from "@/components/shared/MpmNav";
 
 export const dynamic = "force-dynamic";
-
-const ACTION_LABEL: Record<string, string> = {
-  "proposal.submit": "Mengajukan proposal",
-  "proposal.resubmit": "Mengajukan revisi proposal",
-  "proposal.approve": "Menyetujui proposal",
-  "proposal.reject": "Menolak proposal",
-  "proposal.revisi_diminta": "Meminta revisi",
-  "proposal.auto_mulai": "Kegiatan otomatis berlangsung",
-  "proposal.auto_lpj_menunggu": "Otomatis menunggu LPJ",
-  "lpj.submit": "Mengirim LPJ",
-  "lpj.resubmit": "Mengirim ulang LPJ",
-  "lpj.approve": "Menyetujui LPJ",
-  "lpj.revisi_diminta": "Meminta revisi LPJ",
-  "ormawa.created": "Membuat ormawa",
-  "ormawa.status_changed": "Mengubah status ormawa",
-};
 
 export default async function MpmActivityLogPage({
   searchParams,
@@ -63,15 +47,7 @@ export default async function MpmActivityLogPage({
         <p className="mt-1 text-sm text-muted-foreground">{data.total} peristiwa tercatat</p>
       </div>
 
-      <TabNav
-        items={[
-          { href: "/mpm/dashboard", label: "Ringkasan" },
-          { href: "/mpm/proposals", label: "Proposal" },
-          { href: "/mpm/lpj", label: "LPJ" },
-          { href: "/mpm/ormawa", label: "Ormawa" },
-          { href: "/mpm/activity-log", label: "Log aktivitas", active: true },
-        ]}
-      />
+      <MpmNav active="log" />
 
       <ActivityLogFilters
         role={role}

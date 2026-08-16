@@ -33,6 +33,22 @@ export const STATUS_LPJ_LABEL: Record<StatusLpj, string> = {
   revisi_diminta: "Revisi Diminta",
 };
 
+export const ACTION_LABEL: Record<string, string> = {
+  "proposal.submit": "Mengajukan proposal",
+  "proposal.resubmit": "Mengajukan revisi proposal",
+  "proposal.approve": "Menyetujui proposal",
+  "proposal.reject": "Menolak proposal",
+  "proposal.revisi_diminta": "Meminta revisi",
+  "proposal.auto_mulai": "Kegiatan otomatis berlangsung",
+  "proposal.auto_lpj_menunggu": "Otomatis menunggu LPJ",
+  "lpj.submit": "Mengirim LPJ",
+  "lpj.resubmit": "Mengirim ulang LPJ",
+  "lpj.approve": "Menyetujui LPJ",
+  "lpj.revisi_diminta": "Meminta revisi LPJ",
+  "ormawa.created": "Membuat ormawa",
+  "ormawa.status_changed": "Mengubah status ormawa",
+};
+
 export const STATUS_PROPOSAL_FILTER: Array<{ value: string; label: string }> = [
   { value: "semua", label: "Semua status" },
   ...Object.entries(STATUS_PROPOSAL_LABEL).map(([value, label]) => ({ value, label })),

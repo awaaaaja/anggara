@@ -1,10 +1,11 @@
 "use server";
 
 import { z } from "zod";
-import { and, count, desc, eq, gte, lt, inArray, sql } from "drizzle-orm";
+import { and, asc, count, desc, eq, gte, inArray, lt, or, sql } from "drizzle-orm";
 import { getCurrentProfile } from "@/lib/auth/get-current-profile";
 import { db } from "@/lib/db/client";
 import {
+  activityLogs,
   anggaran,
   dokumentasiKegiatan,
   lpj,
@@ -168,12 +169,62 @@ export async function getProposalForOrmawa(proposalId: string, ormawaId: string)
   return getProposalForReview(proposalId);
 }
 
+export async function listLpjOrmawa(ormawaId: string) {
+  return db
+    .select({
+      proposalId: proposals.id,
+      judul: proposals.judul_kegiatan,
+      tanggalMulai: proposals.tanggal_mulai,
+      tanggalSelesai: proposals.tanggal_selesai,
+      status: proposals.status,
+      lpjStatus: lpj.status,
+      lpjCatatan: lpj.catatan_review,
+      totalRealisasi: lpj.total_realisasi,
+      fileLpjUrl: lpj.file_lpj_url,
+      createdAt: proposals.created_at,
+    })
+    .from(proposals)
+    .leftJoin(lpj, eq(lpj.proposal_id, proposals.id))
+    .where(eq(proposals.ormawa_id, ormawaId))
+    .orderBy(desc(proposals.created_at));
+}
+
+export async function getProposalTimeline(proposalId: string, ormawaId: string) {
+  const [own] = await db
+    .select({ id: proposals.id })
+    .from(proposals)
+    .where(and(eq(proposals.id, proposalId), eq(proposals.ormawa_id, ormawaId)))
+    .limit(1);
+  if (!own) return [];
+  const lpjIds = await db
+    .select({ id: lpj.id })
+    .from(lpj)
+    .where(eq(lpj.proposal_id, proposalId));
+  const logs = await db
+    .select({
+      waktu: activityLogs.created_at,
+      action: activityLogs.action,
+      actorRole: activityLogs.actor_role,
+      metadata: activityLogs.metadata,
+    })
+    .from(activityLogs)
+    .where(
+      or(
+        and(eq(activityLogs.target_table, "proposals"), eq(activityLogs.target_id, proposalId)),
+        and(eq(activityLogs.target_table, "lpj"), inArray(activityLogs.target_id, lpjIds.map((l) => l.id))),
+      ),
+    )
+    .orderBy(asc(activityLogs.created_at));
+  return logs;
+}
+
 export async function createProposalAction(
   formData: FormData,
 ): Promise<ActionResult> {
   const mode: "draft" | "diajukan" = formData.get("mode") === "draft" ? "draft" : "diajukan";
   const parsed = proposalFormSchema.safeParse({
     judul_kegiatan: formData.get("judul_kegiatan"),
+    divisi_pengaju: formData.get("divisi_pengaju") || undefined,
     deskripsi: formData.get("deskripsi"),
     tujuan_kegiatan: formData.get("tujuan_kegiatan"),
     tanggal_mulai: formData.get("tanggal_mulai"),
@@ -202,6 +253,7 @@ export async function createProposalAction(
       .values({
         ormawa_id: profile.ormawa_id,
         judul_kegiatan: data.judul_kegiatan,
+        divisi_pengaju: data.divisi_pengaju ?? null,
         deskripsi: data.deskripsi,
         tujuan_kegiatan: data.tujuan_kegiatan,
         tanggal_mulai: new Date(data.tanggal_mulai),
@@ -232,6 +284,7 @@ export async function createProposalAction(
 export async function resubmitProposalAction(formData: FormData): Promise<ActionResult> {
   const parsed = proposalFormSchema.safeParse({
     judul_kegiatan: formData.get("judul_kegiatan"),
+    divisi_pengaju: formData.get("divisi_pengaju") || undefined,
     deskripsi: formData.get("deskripsi"),
     tujuan_kegiatan: formData.get("tujuan_kegiatan"),
     tanggal_mulai: formData.get("tanggal_mulai"),
@@ -261,6 +314,7 @@ export async function resubmitProposalAction(formData: FormData): Promise<Action
       status: proposals.status,
       versi_revisi: proposals.versi_revisi,
       judul_kegiatan: proposals.judul_kegiatan,
+      divisi_pengaju: proposals.divisi_pengaju,
       deskripsi: proposals.deskripsi,
       tujuan_kegiatan: proposals.tujuan_kegiatan,
       tanggal_mulai: proposals.tanggal_mulai,
@@ -291,6 +345,7 @@ export async function resubmitProposalAction(formData: FormData): Promise<Action
       versi: versiLama,
       snapshot: {
         judul_kegiatan: proposal.judul_kegiatan,
+        divisi_pengaju: proposal.divisi_pengaju,
         deskripsi: proposal.deskripsi,
         tujuan_kegiatan: proposal.tujuan_kegiatan,
         tanggal_mulai: proposal.tanggal_mulai.toISOString().slice(0, 10),
@@ -305,6 +360,7 @@ export async function resubmitProposalAction(formData: FormData): Promise<Action
       .update(proposals)
       .set({
         judul_kegiatan: data.judul_kegiatan,
+        divisi_pengaju: data.divisi_pengaju ?? null,
         deskripsi: data.deskripsi,
         tujuan_kegiatan: data.tujuan_kegiatan,
         tanggal_mulai: new Date(data.tanggal_mulai),

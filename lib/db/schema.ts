@@ -83,6 +83,7 @@ export const proposals = pgTable("proposals", {
     .notNull()
     .references(() => ormawa.id),
   judul_kegiatan: text("judul_kegiatan").notNull(),
+  divisi_pengaju: text("divisi_pengaju"),
   deskripsi: text("deskripsi").notNull(),
   tujuan_kegiatan: text("tujuan_kegiatan").notNull(),
   tanggal_mulai: date("tanggal_mulai", { mode: "date" }).notNull(),

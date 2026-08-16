@@ -2,6 +2,7 @@ import Image from "next/image";
 import { LogOut } from "lucide-react";
 import { logoutAction } from "@/lib/auth/actions";
 import type { CurrentProfile } from "@/lib/auth/get-current-profile";
+import { ThemeToggle } from "@/components/shared/ThemeToggle";
 
 const roleLabel: Record<CurrentProfile["role"], string> = {
   mpm: "MPM",
@@ -18,7 +19,7 @@ export function AppShell({
 }) {
   return (
     <div className="flex min-h-dvh flex-col">
-      <header className="sticky top-0 z-30 border-b border-white/10 bg-background/60 backdrop-blur-xl">
+      <header className="sticky top-0 z-30 border-b border-border bg-background/60 backdrop-blur-xl">
         <div className="mx-auto flex h-14 w-full max-w-5xl items-center justify-between gap-3 px-4">
           <div className="flex min-w-0 items-center gap-3">
             <Image
@@ -35,11 +36,12 @@ export function AppShell({
             <span className="rounded-full border border-gold/40 bg-gold/10 px-2.5 py-0.5 text-xs font-medium text-gold">
               {roleLabel[profile.role]}
             </span>
+            <ThemeToggle />
             <form action={logoutAction}>
               <button
                 type="submit"
                 aria-label="Keluar"
-                className="flex size-8 items-center justify-center rounded-full border border-white/10 bg-white/5 text-muted-foreground transition-all hover:bg-white/10 hover:text-foreground"
+                className="flex size-8 items-center justify-center rounded-full border border-border bg-muted/50 text-muted-foreground transition-all hover:bg-muted hover:text-foreground"
               >
                 <LogOut className="size-4" />
               </button>
@@ -47,7 +49,7 @@ export function AppShell({
           </div>
         </div>
       </header>
-      <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-6">{children}</main>
+      <main className="mx-auto w-full max-w-5xl flex-1 px-4 pb-24 pt-6 md:pb-10">{children}</main>
     </div>
   );
 }

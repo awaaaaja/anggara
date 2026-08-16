@@ -34,6 +34,7 @@ export function ProposalDetail({
         <h1 className="text-2xl font-bold tracking-tight">{proposal.judul_kegiatan}</h1>
         <p className="text-sm text-muted-foreground">
           {proposal.ormawaNama} · {proposal.ormawaJenis}
+          {proposal.divisi_pengaju && <> · {proposal.divisi_pengaju}</>}
         </p>
         {proposal.catatan_review && (
           <div className="rounded-lg border bg-muted/40 px-4 py-3">
@@ -48,6 +49,9 @@ export function ProposalDetail({
       <dl>
         <Field label="Deskripsi kegiatan">{proposal.deskripsi}</Field>
         <Field label="Tujuan kegiatan">{proposal.tujuan_kegiatan}</Field>
+        {proposal.divisi_pengaju && (
+          <Field label="Divisi / Komisi / Kementerian">{proposal.divisi_pengaju}</Field>
+        )}
         <Field label="Pelaksanaan">
           {TANGGAL.format(new Date(proposal.tanggal_mulai))} — {TANGGAL.format(new Date(proposal.tanggal_selesai))}
         </Field>

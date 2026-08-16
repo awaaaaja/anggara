@@ -1,11 +1,11 @@
 import Link from "next/link";
 import { listLpjGallery } from "@/lib/db/queries/mpm";
 import { StatusBadge } from "@/components/shared/StatusBadge";
-import { TabNav } from "@/components/shared/TabNav";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { RUPIAH } from "@/lib/constants";
 import { PdfPreviewDialog } from "@/components/shared/PdfPreviewDialog";
+import { MpmNav } from "@/components/shared/MpmNav";
 
 export const dynamic = "force-dynamic";
 
@@ -27,15 +27,7 @@ export default async function MpmLpjPage({
         </p>
       </div>
 
-      <TabNav
-        items={[
-          { href: "/mpm/dashboard", label: "Ringkasan" },
-          { href: "/mpm/proposals", label: "Proposal" },
-          { href: "/mpm/lpj", label: "LPJ", active: true },
-          { href: "/mpm/ormawa", label: "Ormawa" },
-          { href: "/mpm/activity-log", label: "Log aktivitas" },
-        ]}
-      />
+      <MpmNav active="lpj" />
 
       {gallery.length === 0 && (
         <p className="rounded-lg border border-dashed px-4 py-10 text-center text-sm text-muted-foreground">
@@ -69,7 +61,7 @@ export default async function MpmLpjPage({
                     <p className="font-semibold">{RUPIAH.format(Number(g.totalRealisasi))}</p>
                   </div>
                 </div>
-                <p className={`text-xs ${selisih >= 0 ? "text-emerald-600" : "text-red-600"}`}>
+                <p className={`text-xs ${selisih >= 0 ? "text-emerald-700 dark:text-emerald-400" : "text-red-700 dark:text-red-400"}`}>
                   {selisih >= 0 ? "Sisa" : "Selisih kurang"}: {RUPIAH.format(Math.abs(selisih))}
                 </p>
 

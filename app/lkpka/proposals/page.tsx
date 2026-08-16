@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { listOrmawaOptions, listProposalsForReview } from "@/lib/db/queries/lkpka";
+import { PdfPreviewDialog } from "@/components/shared/PdfPreviewDialog";
 import { FilterBar } from "@/components/proposal/FilterBar";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { LkpkaNav } from "@/components/shared/LkpkaNav";
@@ -82,6 +83,11 @@ export default async function LkpkaProposalsPage({
                           {TANGGAL.format(new Date(p.tanggal_mulai))} — {TANGGAL.format(new Date(p.tanggal_selesai))}
                         </span>
                       </Link>
+                      {p.file_proposal_url && (
+                        <div className="mt-1">
+                          <PdfPreviewDialog url={p.file_proposal_url} label="Lihat PDF" />
+                        </div>
+                      )}
                     </TableCell>
                     <TableCell className="whitespace-nowrap text-sm">{p.ormawaNama}</TableCell>
                     <TableCell className="whitespace-nowrap text-sm tabular-nums">

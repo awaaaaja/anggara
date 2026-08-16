@@ -2,7 +2,6 @@ import { listOrmawaAdmin } from "@/lib/db/queries/mpm";
 import Link from "next/link";
 import { OrmawaFormDialog } from "@/components/mpm/OrmawaFormDialog";
 import { OrmawaStatusToggle } from "@/components/mpm/OrmawaStatusToggle";
-import { TabNav } from "@/components/shared/TabNav";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,14 +13,15 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { TANGGAL } from "@/lib/constants";
+import { MpmNav } from "@/components/shared/MpmNav";
 
 function StatusOrmawaBadge({ status }: { status: "aktif" | "nonaktif" }) {
   return (
     <Badge
       className={
         status === "aktif"
-          ? "border-emerald-300 bg-emerald-50 font-medium text-emerald-800"
-          : "border-red-300 bg-red-50 font-medium text-red-800"
+          ? "border-emerald-300 bg-emerald-50 font-medium text-emerald-800 dark:border-emerald-400/40 dark:bg-emerald-400/10 dark:text-emerald-300"
+          : "border-red-300 bg-red-50 font-medium text-red-800 dark:border-red-400/40 dark:bg-red-400/10 dark:text-red-300"
       }
     >
       {status === "aktif" ? "Aktif" : "Nonaktif"}
@@ -50,15 +50,7 @@ export default async function MpmOrmawaPage({
         <OrmawaFormDialog />
       </div>
 
-      <TabNav
-        items={[
-          { href: "/mpm/dashboard", label: "Ringkasan" },
-          { href: "/mpm/proposals", label: "Proposal" },
-          { href: "/mpm/lpj", label: "LPJ" },
-          { href: "/mpm/ormawa", label: "Ormawa", active: true },
-          { href: "/mpm/activity-log", label: "Log aktivitas" },
-        ]}
-      />
+      <MpmNav active="ormawa" />
 
       <div className="overflow-x-auto rounded-lg border">
         <Table>

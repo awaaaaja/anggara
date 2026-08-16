@@ -1,9 +1,9 @@
 import Link from "next/link";
 import { listAllProposals } from "@/lib/db/queries/mpm";
 import { listOrmawaOptions } from "@/lib/db/queries/lkpka";
+import { PdfPreviewDialog } from "@/components/shared/PdfPreviewDialog";
 import { FilterBar } from "@/components/proposal/FilterBar";
 import { StatusBadge } from "@/components/shared/StatusBadge";
-import { TabNav } from "@/components/shared/TabNav";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -14,6 +14,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { RUPIAH, TANGGAL } from "@/lib/constants";
+import { MpmNav } from "@/components/shared/MpmNav";
 
 export const dynamic = "force-dynamic";
 
@@ -55,15 +56,7 @@ export default async function MpmProposalsPage({
         </p>
       </div>
 
-      <TabNav
-        items={[
-          { href: "/mpm/dashboard", label: "Ringkasan" },
-          { href: "/mpm/proposals", label: "Proposal", active: true },
-          { href: "/mpm/lpj", label: "LPJ" },
-          { href: "/mpm/ormawa", label: "Ormawa" },
-          { href: "/mpm/activity-log", label: "Log aktivitas" },
-        ]}
-      />
+      <MpmNav active="proposal" />
 
       <FilterBar
         basePath="/mpm/proposals"
@@ -102,6 +95,11 @@ export default async function MpmProposalsPage({
                   <p className="text-xs text-muted-foreground">
                     {TANGGAL.format(new Date(p.tanggal_mulai))} — {TANGGAL.format(new Date(p.tanggal_selesai))}
                   </p>
+                  {p.file_proposal_url && (
+                    <div className="mt-1">
+                      <PdfPreviewDialog url={p.file_proposal_url} label="Lihat PDF" />
+                    </div>
+                  )}
                 </TableCell>
                 <TableCell className="text-sm">{p.ormawaNama}</TableCell>
                 <TableCell>

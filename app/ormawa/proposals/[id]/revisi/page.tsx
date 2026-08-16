@@ -39,6 +39,7 @@ export default async function RevisiProposalPage({
         defaults={{
           proposalId: proposal.id,
           judul_kegiatan: proposal.judul_kegiatan,
+          divisi_pengaju: proposal.divisi_pengaju,
           deskripsi: proposal.deskripsi,
           tujuan_kegiatan: proposal.tujuan_kegiatan,
           tanggal_mulai: proposal.tanggal_mulai.toISOString().slice(0, 10),

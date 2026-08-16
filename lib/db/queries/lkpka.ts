@@ -12,6 +12,44 @@ import {
 
 export type ProposalStatusFilter = string;
 
+export async function listArsipProposals() {
+  return db
+    .select({
+      id: proposals.id,
+      judul_kegiatan: proposals.judul_kegiatan,
+      divisi_pengaju: proposals.divisi_pengaju,
+      status: proposals.status,
+      tanggal_mulai: proposals.tanggal_mulai,
+      tanggal_selesai: proposals.tanggal_selesai,
+      anggaran_diajukan: proposals.anggaran_diajukan,
+      anggaran_disetujui: anggaran.nominal_disetujui,
+      created_at: proposals.created_at,
+      ormawaNama: ormawa.nama,
+    })
+    .from(proposals)
+    .leftJoin(ormawa, eq(proposals.ormawa_id, ormawa.id))
+    .leftJoin(anggaran, eq(anggaran.proposal_id, proposals.id))
+    .orderBy(desc(proposals.created_at));
+}
+
+export async function listArsipLpj() {
+  return db
+    .select({
+      proposalId: lpj.proposal_id,
+      judul: proposals.judul_kegiatan,
+      ormawaNama: ormawa.nama,
+      status: lpj.status,
+      totalRealisasi: lpj.total_realisasi,
+      ringkasan: lpj.ringkasan_penggunaan_dana,
+      catatan: lpj.catatan_review,
+      createdAt: lpj.created_at,
+    })
+    .from(lpj)
+    .innerJoin(proposals, eq(lpj.proposal_id, proposals.id))
+    .leftJoin(ormawa, eq(proposals.ormawa_id, ormawa.id))
+    .orderBy(desc(lpj.created_at));
+}
+
 export async function getLkpkaSummary() {
   const startOfMonth = new Date();
   startOfMonth.setDate(1);
@@ -71,6 +109,7 @@ export async function listProposalsForReview(opts: {
       id: proposals.id,
       judul_kegiatan: proposals.judul_kegiatan,
       status: proposals.status,
+      file_proposal_url: proposals.file_proposal_url,
       tanggal_mulai: proposals.tanggal_mulai,
       tanggal_selesai: proposals.tanggal_selesai,
       anggaran_diajukan: proposals.anggaran_diajukan,
@@ -92,6 +131,7 @@ export async function getProposalForReview(proposalId: string) {
     .select({
       id: proposals.id,
       judul_kegiatan: proposals.judul_kegiatan,
+      divisi_pengaju: proposals.divisi_pengaju,
       deskripsi: proposals.deskripsi,
       tujuan_kegiatan: proposals.tujuan_kegiatan,
       tanggal_mulai: proposals.tanggal_mulai,

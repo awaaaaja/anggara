@@ -18,6 +18,7 @@ import { uploadPdfFile } from "@/lib/supabase/upload-pdf";
 type Defaults = {
   proposalId?: string;
   judul_kegiatan: string;
+  divisi_pengaju?: string | null;
   deskripsi: string;
   tujuan_kegiatan: string;
   tanggal_mulai: string;
@@ -41,6 +42,7 @@ export function ProposalForm({ defaults, userId }: { defaults?: Defaults; userId
     defaultValues: defaults
       ? {
           judul_kegiatan: defaults.judul_kegiatan,
+          divisi_pengaju: defaults.divisi_pengaju ?? "",
           deskripsi: defaults.deskripsi,
           tujuan_kegiatan: defaults.tujuan_kegiatan,
           tanggal_mulai: defaults.tanggal_mulai,
@@ -73,6 +75,7 @@ export function ProposalForm({ defaults, userId }: { defaults?: Defaults; userId
 
     const fd = new FormData();
     fd.set("judul_kegiatan", values.judul_kegiatan);
+    if (values.divisi_pengaju) fd.set("divisi_pengaju", values.divisi_pengaju);
     fd.set("deskripsi", values.deskripsi);
     fd.set("tujuan_kegiatan", values.tujuan_kegiatan);
     fd.set("tanggal_mulai", values.tanggal_mulai);
@@ -115,6 +118,17 @@ export function ProposalForm({ defaults, userId }: { defaults?: Defaults; userId
           {...field("judul_kegiatan")}
         />
         {errors.judul_kegiatan && <p className="text-xs text-destructive">{errors.judul_kegiatan.message}</p>}
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <Label htmlFor="divisi_pengaju">Divisi / Komisi / Kementerian pengaju</Label>
+        <Input
+          id="divisi_pengaju"
+          placeholder="Contoh: Kementerian Riset & Teknologi"
+          aria-invalid={!!errors.divisi_pengaju}
+          {...field("divisi_pengaju")}
+        />
+        {errors.divisi_pengaju && <p className="text-xs text-destructive">{errors.divisi_pengaju.message}</p>}
       </div>
 
       <div className="flex flex-col gap-2">
