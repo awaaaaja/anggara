@@ -22,7 +22,7 @@ export async function dbAsUser<T>(userId: string, fn: (tx: DbTx) => Promise<T>):
   return db.transaction(async (tx) => {
     await tx.execute(sql`set local role authenticated`);
     await tx.execute(
-      sql`set local "request.jwt.claims" = ${JSON.stringify({ sub: userId, role: "authenticated" })}`,
+      sql`select set_config('request.jwt.claims', ${JSON.stringify({ sub: userId, role: "authenticated" })}, true)`,
     );
     return fn(tx);
   });
