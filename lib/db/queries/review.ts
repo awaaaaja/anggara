@@ -129,37 +129,44 @@ export async function approveProposalAction(formData: FormData): Promise<ActionR
 
   const now = new Date();
   const reviewerId = guard.profile.id;
-  await db.transaction(async (tx) => {
-    await tx
-      .update(proposals)
-      .set({
-        status: "disetujui",
-        catatan_review: parsed.data.catatan ?? null,
-        direview_oleh: reviewerId,
-        direview_pada: now,
-      })
-      .where(eq(proposals.id, guard.proposalId));
+  try {
+    await db.transaction(async (tx) => {
+      await tx
+        .update(proposals)
+        .set({
+          status: "disetujui",
+          catatan_review: parsed.data.catatan ?? null,
+          direview_oleh: reviewerId,
+          direview_pada: now,
+        })
+        .where(eq(proposals.id, guard.proposalId));
 
-    await tx.insert(anggaran).values({
-      proposal_id: guard.proposalId,
-      nominal_disetujui: String(parsed.data.nominal),
-      catatan_anggaran: parsed.data.catatan ?? null,
-      ditetapkan_oleh: reviewerId,
-      ditetapkan_pada: now,
+      await tx.insert(anggaran).values({
+        proposal_id: guard.proposalId,
+        nominal_disetujui: String(parsed.data.nominal),
+        catatan_anggaran: parsed.data.catatan ?? null,
+        ditetapkan_oleh: reviewerId,
+        ditetapkan_pada: now,
+      });
+
+      await logActivity(
+        {
+          actorId: reviewerId,
+          actorRole: "lkpka",
+          action: "proposal.approve",
+          targetTable: "proposals",
+          targetId: guard.proposalId,
+          metadata: { nominal: String(parsed.data.nominal), catatan: parsed.data.catatan ?? null },
+        },
+        tx,
+      );
     });
-
-    await logActivity(
-      {
-        actorId: reviewerId,
-        actorRole: "lkpka",
-        action: "proposal.approve",
-        targetTable: "proposals",
-        targetId: guard.proposalId,
-        metadata: { nominal: String(parsed.data.nominal), catatan: parsed.data.catatan ?? null },
-      },
-      tx,
-    );
-  });
+  } catch (err) {
+    if (typeof err === "object" && err !== null && "code" in err && (err as { code?: string }).code === "23505") {
+      return { error: "Proposal sudah diproses sebelumnya." };
+    }
+    throw err;
+  }
 
   return { ok: true };
 }

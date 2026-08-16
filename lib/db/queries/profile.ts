@@ -24,6 +24,10 @@ export async function updateProfileLogo(formData: FormData) {
     return { error: parsed.error.issues[0]?.message ?? "Data tidak valid." };
   }
 
-  await db.execute(sql`select public.update_own_logo(${parsed.data.logoUrl})`);
+  try {
+    await db.execute(sql`select public.update_own_logo(${parsed.data.logoUrl})`);
+  } catch {
+    return { error: "Gagal menyimpan logo. Coba lagi." };
+  }
   return { ok: true };
 }

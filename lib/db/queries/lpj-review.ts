@@ -15,11 +15,14 @@ async function guardLkpkaLpjReview(proposalId: string) {
     return { ok: false as const, error: "Hanya LKPKA yang dapat mereview LPJ." };
   }
   const [lpjRow] = await db
-    .select({ id: lpj.id, proposal_id: lpj.proposal_id })
+    .select({ id: lpj.id, proposal_id: lpj.proposal_id, status: lpj.status })
     .from(lpj)
     .where(eq(lpj.proposal_id, proposalId))
     .limit(1);
   if (!lpjRow) return { ok: false as const, error: "LPJ belum disubmit." };
+  if (!["menunggu", "revisi_diminta"].includes(lpjRow.status)) {
+    return { ok: false as const, error: "LPJ sudah diproses." };
+  }
   return { ok: true as const, profile, lpjRow };
 }
 
@@ -33,6 +36,9 @@ export async function mintaRevisiLpjAction(formData: FormData): Promise<ActionRe
 
   const guard = await guardLkpkaLpjReview(proposalId);
   if (!guard.ok) return { error: guard.error };
+  if (guard.lpjRow.status === "revisi_diminta") {
+    return { error: "LPJ ini sedang menunggu perbaikan dari ormawa." };
+  }
 
   await db.transaction(async (tx) => {
     await tx
