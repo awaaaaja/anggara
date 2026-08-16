@@ -2,13 +2,8 @@ import { getMpmSummary } from "@/lib/db/queries/mpm";
 import { applyAutoStatusTransitions } from "@/lib/db/queries/status-auto";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { RUPIAH, STATUS_PROPOSAL_LABEL } from "@/lib/constants";
-import nextDynamic from "next/dynamic";
 import { MpmNav } from "@/components/shared/MpmNav";
-
-const AnggaranPerOrmawaChart = nextDynamic(
-  () => import("@/components/mpm/AnggaranPerOrmawaChart").then((m) => m.AnggaranPerOrmawaChart),
-  { ssr: false },
-);
+import { AnggaranChartSection } from "@/components/mpm/AnggaranChartSection";
 
 const STATUS_COLOR: Record<string, string> = {
   draft: "text-zinc-600 dark:text-zinc-400",
@@ -62,7 +57,7 @@ export default async function MpmDashboardPage() {
             <CardTitle className="text-sm font-medium">Anggaran disetujui per ormawa</CardTitle>
           </CardHeader>
           <CardContent>
-            <AnggaranPerOrmawaChart data={summary.perOrmawa} />
+            <AnggaranChartSection data={summary.perOrmawa} />
           </CardContent>
         </Card>
 
