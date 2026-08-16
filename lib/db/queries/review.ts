@@ -2,7 +2,7 @@
 
 import { eq } from "drizzle-orm";
 import { getCurrentProfile, type CurrentProfile } from "@/lib/auth/get-current-profile";
-import { db } from "@/lib/db/client";
+import { db, dbAsUser } from "@/lib/db/client";
 import { anggaran, proposals } from "@/lib/db/schema";
 import { logActivity } from "@/lib/db/queries/activity-log";
 import {
@@ -48,7 +48,7 @@ export async function rejectProposalAction(formData: FormData): Promise<ActionRe
 
   const now = new Date();
   const reviewerId = guard.profile.id;
-  await db.transaction(async (tx) => {
+  await dbAsUser(guard.profile.id, async (tx) => {
     await tx
       .update(proposals)
       .set({
@@ -88,7 +88,7 @@ export async function requestRevisionAction(formData: FormData): Promise<ActionR
 
   const now = new Date();
   const reviewerId = guard.profile.id;
-  await db.transaction(async (tx) => {
+  await dbAsUser(guard.profile.id, async (tx) => {
     await tx
       .update(proposals)
       .set({
@@ -130,7 +130,7 @@ export async function approveProposalAction(formData: FormData): Promise<ActionR
   const now = new Date();
   const reviewerId = guard.profile.id;
   try {
-    await db.transaction(async (tx) => {
+    await dbAsUser(guard.profile.id, async (tx) => {
       await tx
         .update(proposals)
         .set({

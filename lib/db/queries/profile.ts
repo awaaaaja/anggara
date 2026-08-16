@@ -3,7 +3,7 @@
 import { z } from "zod";
 import { sql } from "drizzle-orm";
 import { getCurrentProfile } from "@/lib/auth/get-current-profile";
-import { db } from "@/lib/db/client";
+import { dbAsUser } from "@/lib/db/client";
 
 const logoUrlSchema = z.object({
   logoUrl: z
@@ -25,7 +25,9 @@ export async function updateProfileLogo(formData: FormData) {
   }
 
   try {
-    await db.execute(sql`select public.update_own_logo(${parsed.data.logoUrl})`);
+    await dbAsUser(profile.id, async (tx) => {
+      await tx.execute(sql`select public.update_own_logo(${parsed.data.logoUrl})`);
+    });
   } catch {
     return { error: "Gagal menyimpan logo. Coba lagi." };
   }

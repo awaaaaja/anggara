@@ -3,7 +3,7 @@
 import { z } from "zod";
 import { and, asc, count, desc, eq, gte, inArray, lt, or, sql } from "drizzle-orm";
 import { getCurrentProfile } from "@/lib/auth/get-current-profile";
-import { db } from "@/lib/db/client";
+import { db, dbAsUser } from "@/lib/db/client";
 import {
   activityLogs,
   anggaran,
@@ -247,7 +247,7 @@ export async function createProposalAction(
   if (fileProposalUrl && typeof fileProposalUrl !== "string") {
     return { error: "Data PDF proposal tidak valid." };
   }
-  const inserted = await db.transaction(async (tx) => {
+  const inserted = await dbAsUser(profile.id, async (tx) => {
     const [row] = await tx
       .insert(proposals)
       .values({
@@ -339,7 +339,7 @@ export async function resubmitProposalAction(formData: FormData): Promise<Action
     return { error: "Data PDF proposal tidak valid." };
   }
   const versiLama = proposal.versi_revisi;
-  await db.transaction(async (tx) => {
+  await dbAsUser(profile.id, async (tx) => {
     await tx.insert(proposalRevisions).values({
       proposal_id: proposal.id,
       versi: versiLama,
@@ -452,7 +452,7 @@ export async function submitLpjAction(formData: FormData): Promise<ActionResult>
     .where(eq(lpj.proposal_id, proposal.id))
     .limit(1);
 
-  await db.transaction(async (tx) => {
+  await dbAsUser(profile.id, async (tx) => {
     let lpjId: string;
     if (lpjLama) {
       await tx

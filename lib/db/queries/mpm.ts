@@ -3,7 +3,7 @@
 import { z } from "zod";
 import { and, asc, count, desc, eq, gte, inArray, sql } from "drizzle-orm";
 import { getCurrentProfile } from "@/lib/auth/get-current-profile";
-import { db } from "@/lib/db/client";
+import { db, dbAsUser } from "@/lib/db/client";
 import { createAdminClient } from "@/lib/supabase/admin";
 import {
   activityLogs,
@@ -114,25 +114,29 @@ export async function createOrmawaAction(input: z.infer<typeof createOrmawaSchem
   }
 
   try {
-    const [org] = await db
-      .insert(ormawa)
-      .values({ nama, jenis, deskripsi, status: "aktif", dibuat_oleh: guard.profile.id })
-      .returning({ id: ormawa.id });
+    const org = await dbAsUser(guard.profile.id, async (tx) => {
+      const [orgRow] = await tx
+        .insert(ormawa)
+        .values({ nama, jenis, deskripsi, status: "aktif", dibuat_oleh: guard.profile.id })
+        .returning({ id: ormawa.id });
 
-    await db.insert(profiles).values({
-      id: created.user.id,
-      role: "ormawa",
-      full_name: nama,
-      ormawa_id: org.id,
-    });
+      await tx.insert(profiles).values({
+        id: created.user.id,
+        role: "ormawa",
+        full_name: nama,
+        ormawa_id: orgRow.id,
+      });
 
-    await logActivity({
-      actorId: guard.profile.id,
-      actorRole: "mpm",
-      action: "ormawa.created",
-      targetTable: "ormawa",
-      targetId: org.id,
-      metadata: { email },
+      await logActivity({
+        actorId: guard.profile.id,
+        actorRole: "mpm",
+        action: "ormawa.created",
+        targetTable: "ormawa",
+        targetId: orgRow.id,
+        metadata: { email },
+      });
+
+      return orgRow;
     });
 
     return { ok: true, id: org.id };
@@ -154,14 +158,16 @@ export async function toggleOrmawaStatusAction(ormawaId: string): Promise<Action
   if (!org) return { error: "Ormawa tidak ditemukan." };
 
   const next = org.status === "aktif" ? "nonaktif" : "aktif";
-  await db.update(ormawa).set({ status: next }).where(eq(ormawa.id, ormawaId));
-  await logActivity({
-    actorId: guard.profile.id,
-    actorRole: "mpm",
-    action: "ormawa.status_changed",
-    targetTable: "ormawa",
-    targetId: org.id,
-    metadata: { dari: org.status, ke: next },
+  await dbAsUser(guard.profile.id, async (tx) => {
+    await tx.update(ormawa).set({ status: next }).where(eq(ormawa.id, ormawaId));
+    await logActivity({
+      actorId: guard.profile.id,
+      actorRole: "mpm",
+      action: "ormawa.status_changed",
+      targetTable: "ormawa",
+      targetId: org.id,
+      metadata: { dari: org.status, ke: next },
+    });
   });
   return { ok: true };
 }

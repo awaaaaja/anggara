@@ -2,7 +2,7 @@
 
 import { eq } from "drizzle-orm";
 import { getCurrentProfile } from "@/lib/auth/get-current-profile";
-import { db } from "@/lib/db/client";
+import { db, dbAsUser } from "@/lib/db/client";
 import { lpj, proposals } from "@/lib/db/schema";
 import { logActivity } from "@/lib/db/queries/activity-log";
 
@@ -40,7 +40,7 @@ export async function mintaRevisiLpjAction(formData: FormData): Promise<ActionRe
     return { error: "LPJ ini sedang menunggu perbaikan dari ormawa." };
   }
 
-  await db.transaction(async (tx) => {
+  await dbAsUser(guard.profile.id, async (tx) => {
     await tx
       .update(lpj)
       .set({
@@ -73,7 +73,7 @@ export async function setujuiLpjAction(formData: FormData): Promise<ActionResult
   const guard = await guardLkpkaLpjReview(proposalId);
   if (!guard.ok) return { error: guard.error };
 
-  await db.transaction(async (tx) => {
+  await dbAsUser(guard.profile.id, async (tx) => {
     await tx
       .update(lpj)
       .set({
