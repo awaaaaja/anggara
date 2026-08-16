@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getCurrentProfile } from "@/lib/auth/get-current-profile";
 import { notFound } from "next/navigation";
 import { getProposalForReview } from "@/lib/db/queries/lkpka";
 import { ProposalDetail } from "@/components/proposal/ProposalDetail";
@@ -12,7 +13,8 @@ export default async function LkpkaProposalReviewPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const proposal = await getProposalForReview(id);
+  const profile = await getCurrentProfile();
+  const proposal = await getProposalForReview(id, profile?.id);
   if (!proposal) notFound();
 
   return (

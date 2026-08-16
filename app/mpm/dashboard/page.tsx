@@ -1,4 +1,5 @@
 import { getMpmSummary } from "@/lib/db/queries/mpm";
+import { getCurrentProfile } from "@/lib/auth/get-current-profile";
 import { applyAutoStatusTransitions } from "@/lib/db/queries/status-auto";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { RUPIAH, STATUS_PROPOSAL_LABEL } from "@/lib/constants";
@@ -22,20 +23,43 @@ const STATUS_COLOR: Record<string, string> = {
 export const dynamic = "force-dynamic";
 
 export default async function MpmDashboardPage() {
-  const summary = await applyAutoStatusTransitions().then(() => getMpmSummary());
+  const profile = await getCurrentProfile();
+  const summary = await applyAutoStatusTransitions().then(() => getMpmSummary(profile?.id));
 
   const stats = [
-    { label: "Anggaran disetujui bulan ini", value: RUPIAH.format(summary.totalAnggaranBulanIni), icon: Wallet, tone: "bg-blue-500/10 text-blue-600 dark:bg-blue-400/15 dark:text-blue-300" },
-    { label: "Total proposal", value: String(summary.totalProposal), icon: FileText, tone: "bg-violet-500/10 text-violet-600 dark:bg-violet-400/15 dark:text-violet-300" },
-    { label: "Ormawa aktif", value: String(summary.ormawaAktif), icon: Users, tone: "bg-emerald-500/10 text-emerald-600 dark:bg-emerald-400/15 dark:text-emerald-300" },
-    { label: "Kegiatan selesai", value: String(summary.perStatus.find((s) => s.status === "selesai")?.total ?? 0), icon: CheckCircle2, tone: "bg-gold/10 text-gold dark:bg-gold/15" },
+    {
+      label: "Anggaran disetujui bulan ini",
+      value: RUPIAH.format(summary.totalAnggaranBulanIni),
+      icon: Wallet,
+      tone: "bg-blue-500/10 text-blue-600 dark:bg-blue-400/15 dark:text-blue-300",
+    },
+    {
+      label: "Total proposal",
+      value: String(summary.totalProposal),
+      icon: FileText,
+      tone: "bg-violet-500/10 text-violet-600 dark:bg-violet-400/15 dark:text-violet-300",
+    },
+    {
+      label: "Ormawa aktif",
+      value: String(summary.ormawaAktif),
+      icon: Users,
+      tone: "bg-emerald-500/10 text-emerald-600 dark:bg-emerald-400/15 dark:text-emerald-300",
+    },
+    {
+      label: "Kegiatan selesai",
+      value: String(summary.perStatus.find((s) => s.status === "selesai")?.total ?? 0),
+      icon: CheckCircle2,
+      tone: "bg-gold/10 text-gold dark:bg-gold/15",
+    },
   ];
 
   return (
     <div className="flex flex-col gap-6">
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Ringkasan pengawasan</h1>
-        <p className="mt-1 text-sm text-muted-foreground">Posisi terakhir seluruh kegiatan ormawa.</p>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Posisi terakhir seluruh kegiatan ormawa.
+        </p>
       </div>
 
       <MpmNav active="ringkasan" />
@@ -44,7 +68,9 @@ export default async function MpmDashboardPage() {
         {stats.map((s) => (
           <Card key={s.label} className="overflow-hidden">
             <CardContent className="flex items-center gap-4 p-5">
-              <div className={`flex size-11 shrink-0 items-center justify-center rounded-xl ${s.tone}`}>
+              <div
+                className={`flex size-11 shrink-0 items-center justify-center rounded-xl ${s.tone}`}
+              >
                 <s.icon className="size-5" />
               </div>
               <div className="min-w-0">
@@ -72,14 +98,19 @@ export default async function MpmDashboardPage() {
           </CardHeader>
           <CardContent className="flex flex-col gap-2">
             {summary.perStatus.length === 0 && (
-              <EmptyState title="Belum ada proposal" description="Proposal pertama akan muncul di sini." className="py-8" />
+              <EmptyState
+                title="Belum ada proposal"
+                description="Proposal pertama akan muncul di sini."
+                className="py-8"
+              />
             )}
             {summary.perStatus.map((s) => (
-              <div key={s.status} className="flex items-center justify-between rounded-lg border px-3 py-2">
+              <div
+                key={s.status}
+                className="flex items-center justify-between rounded-lg border px-3 py-2"
+              >
                 <span className="text-sm">{STATUS_PROPOSAL_LABEL[s.status]}</span>
-                <span className={`text-sm font-semibold ${STATUS_COLOR[s.status]}`}>
-                  {s.total}
-                </span>
+                <span className={`text-sm font-semibold ${STATUS_COLOR[s.status]}`}>{s.total}</span>
               </div>
             ))}
           </CardContent>

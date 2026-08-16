@@ -22,7 +22,8 @@ export default async function ProposalBaruPage() {
       <div className="rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-6">
         <p className="text-sm font-medium text-destructive">Organisasi berstatus nonaktif.</p>
         <p className="mt-1 text-sm text-muted-foreground">
-          Anda tidak dapat mengajukan proposal baru. Hubungi MPM untuk mengaktifkan kembali organisasi Anda.
+          Anda tidak dapat mengajukan proposal baru. Hubungi MPM untuk mengaktifkan kembali
+          organisasi Anda.
         </p>
       </div>
     );

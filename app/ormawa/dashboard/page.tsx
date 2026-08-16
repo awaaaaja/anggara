@@ -9,13 +9,7 @@ import { OrmawaNav } from "@/components/shared/OrmawaNav";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { RUPIAH, TANGGAL } from "@/lib/constants";
 import type { StatusProposal } from "@/lib/db/schema";
 
@@ -26,15 +20,53 @@ export default async function OrmawaDashboardPage() {
   if (!profile) redirect("/login");
   if (profile.role !== "ormawa" || !profile.ormawa_id) redirect(`/${profile.role}/dashboard`);
 
-  const summary = await applyAutoStatusTransitions().then(() => getOrmawaSummary(profile.ormawa_id!));
+  const summary = await applyAutoStatusTransitions().then(() =>
+    getOrmawaSummary(profile.ormawa_id!, profile.id),
+  );
 
   const stats = [
-    { label: "Draft", value: summary.draft, href: "/ormawa/proposals?status=draft", icon: FileText, tone: "text-zinc-500 dark:text-zinc-400" },
-    { label: "Menunggu review", value: summary.menungguReview, href: "/ormawa/proposals?status=diajukan", icon: Flag, tone: "text-amber-600 dark:text-amber-400" },
-    { label: "Revisi diminta", value: summary.revisiDiminta, href: "/ormawa/proposals?status=revisi_diminta", icon: RotateCcw, tone: "text-orange-600 dark:text-orange-400" },
-    { label: "Berjalan", value: summary.berjalan, href: "/ormawa/proposals?status=disetujui", icon: Activity, tone: "text-sky-600 dark:text-sky-400" },
-    { label: "Ditolak", value: summary.ditolak, href: "/ormawa/proposals?status=ditolak", icon: XCircle, tone: "text-red-600 dark:text-red-400" },
-    { label: "Selesai", value: summary.selesai, href: "/ormawa/proposals?status=selesai", icon: CheckCircle2, tone: "text-emerald-600 dark:text-emerald-400" },
+    {
+      label: "Draft",
+      value: summary.draft,
+      href: "/ormawa/proposals?status=draft",
+      icon: FileText,
+      tone: "text-zinc-500 dark:text-zinc-400",
+    },
+    {
+      label: "Menunggu review",
+      value: summary.menungguReview,
+      href: "/ormawa/proposals?status=diajukan",
+      icon: Flag,
+      tone: "text-amber-600 dark:text-amber-400",
+    },
+    {
+      label: "Revisi diminta",
+      value: summary.revisiDiminta,
+      href: "/ormawa/proposals?status=revisi_diminta",
+      icon: RotateCcw,
+      tone: "text-orange-600 dark:text-orange-400",
+    },
+    {
+      label: "Berjalan",
+      value: summary.berjalan,
+      href: "/ormawa/proposals?status=disetujui",
+      icon: Activity,
+      tone: "text-sky-600 dark:text-sky-400",
+    },
+    {
+      label: "Ditolak",
+      value: summary.ditolak,
+      href: "/ormawa/proposals?status=ditolak",
+      icon: XCircle,
+      tone: "text-red-600 dark:text-red-400",
+    },
+    {
+      label: "Selesai",
+      value: summary.selesai,
+      href: "/ormawa/proposals?status=selesai",
+      icon: CheckCircle2,
+      tone: "text-emerald-600 dark:text-emerald-400",
+    },
   ];
 
   return (
@@ -51,7 +83,9 @@ export default async function OrmawaDashboardPage() {
               </span>
             )}
           </CardTitle>
-          <CardDescription>Pantau proposal, revisi, dan LPJ organisasi Anda di sini.</CardDescription>
+          <CardDescription>
+            Pantau proposal, revisi, dan LPJ organisasi Anda di sini.
+          </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <LogoUpload
@@ -111,7 +145,8 @@ export default async function OrmawaDashboardPage() {
                 <div className="min-w-0">
                   <p className="truncate text-sm font-medium">{p.judul_kegiatan}</p>
                   <p className="text-xs text-muted-foreground">
-                    {TANGGAL.format(new Date(p.tanggal_mulai))} — {TANGGAL.format(new Date(p.tanggal_selesai))}
+                    {TANGGAL.format(new Date(p.tanggal_mulai))} —{" "}
+                    {TANGGAL.format(new Date(p.tanggal_selesai))}
                   </p>
                 </div>
                 <StatusBadge status={p.status as StatusProposal} />

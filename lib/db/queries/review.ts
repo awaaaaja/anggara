@@ -2,7 +2,7 @@
 
 import { eq } from "drizzle-orm";
 import { getCurrentProfile, type CurrentProfile } from "@/lib/auth/get-current-profile";
-import { db, dbAsUser } from "@/lib/db/client";
+import { db, dbAsUser, queryAs } from "@/lib/db/client";
 import { anggaran, proposals } from "@/lib/db/schema";
 import { logActivity } from "@/lib/db/queries/activity-log";
 import {
@@ -14,19 +14,21 @@ import {
 type ActionResult = { ok: true } | { error: string };
 
 type ReviewGuard =
-  | { ok: false; error: string }
-  | { ok: true; profile: CurrentProfile; proposalId: string };
+  { ok: false; error: string } | { ok: true; profile: CurrentProfile; proposalId: string };
 
 async function guardLkpkaReview(proposalId: string): Promise<ReviewGuard> {
   const profile = await getCurrentProfile();
   if (!profile) return { ok: false, error: "Sesi tidak valid. Silakan login ulang." };
-  if (profile.role !== "lkpka") return { ok: false, error: "Anda tidak berwenang melakukan aksi ini." };
+  if (profile.role !== "lkpka")
+    return { ok: false, error: "Anda tidak berwenang melakukan aksi ini." };
 
-  const [proposal] = await db
-    .select({ id: proposals.id, status: proposals.status })
-    .from(proposals)
-    .where(eq(proposals.id, proposalId))
-    .limit(1);
+  const [proposal] = await queryAs(profile.id, async (q) => {
+    return q
+      .select({ id: proposals.id, status: proposals.status })
+      .from(proposals)
+      .where(eq(proposals.id, proposalId))
+      .limit(1);
+  });
   if (!proposal) return { ok: false, error: "Proposal tidak ditemukan." };
   if (proposal.status !== "diajukan") {
     return { ok: false, error: "Proposal tidak dalam status diajukan." };
@@ -162,7 +164,12 @@ export async function approveProposalAction(formData: FormData): Promise<ActionR
       );
     });
   } catch (err) {
-    if (typeof err === "object" && err !== null && "code" in err && (err as { code?: string }).code === "23505") {
+    if (
+      typeof err === "object" &&
+      err !== null &&
+      "code" in err &&
+      (err as { code?: string }).code === "23505"
+    ) {
       return { error: "Proposal sudah diproses sebelumnya." };
     }
     throw err;

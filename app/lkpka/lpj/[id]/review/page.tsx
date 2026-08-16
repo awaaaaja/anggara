@@ -10,19 +10,19 @@ import type { StatusLpj } from "@/lib/db/schema";
 
 export const dynamic = "force-dynamic";
 
-export default async function LkpkaLpjReviewPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+export default async function LkpkaLpjReviewPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const profile = await getCurrentProfile();
   if (!profile) return null;
 
-  const data = await getLpjForReview(id);
+  const data = await getLpjForReview(id, profile.id);
   if (!data || !data.lpj) notFound();
 
-  const rincian = data.lpj.rincian_pengeluaran as Array<{ item: string; jumlah: number; keterangan?: string }>;
+  const rincian = data.lpj.rincian_pengeluaran as Array<{
+    item: string;
+    jumlah: number;
+    keterangan?: string;
+  }>;
   const bisaReview = data.status === "lpj_direview";
 
   return (
@@ -78,7 +78,9 @@ export default async function LkpkaLpjReviewPage({
               {rincian.map((r, i) => (
                 <tr key={i} className="border-b last:border-0">
                   <td className="px-4 py-3">{r.item}</td>
-                  <td className="px-4 py-3 text-right tabular-nums">{RUPIAH.format(Number(r.jumlah))}</td>
+                  <td className="px-4 py-3 text-right tabular-nums">
+                    {RUPIAH.format(Number(r.jumlah))}
+                  </td>
                   <td className="px-4 py-3 text-muted-foreground">{r.keterangan ?? "—"}</td>
                 </tr>
               ))}
@@ -118,7 +120,8 @@ export default async function LkpkaLpjReviewPage({
                   rel="noreferrer"
                   className="flex aspect-square w-full items-center justify-center rounded-lg border bg-muted text-center text-xs text-muted-foreground"
                 >
-                  {d.file_type === "video" ? "Video" : "Dokumen"} {d.caption ? `· ${d.caption}` : ""}
+                  {d.file_type === "video" ? "Video" : "Dokumen"}{" "}
+                  {d.caption ? `· ${d.caption}` : ""}
                 </a>
               ),
             )}

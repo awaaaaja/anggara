@@ -30,13 +30,16 @@ export default async function OrmawaProposalsPage({
 
   const { status, tahun, page: pageParam } = await searchParams;
   const page = Math.max(1, Number(pageParam) || 1);
-  const tahunOptions = await getOrmawaTahunOptions(profile.ormawa_id);
-  const { rows, total, perPage } = await listProposalsOrmawa({
-    ormawaId: profile.ormawa_id,
-    status,
-    tahun,
-    page,
-  });
+  const tahunOptions = await getOrmawaTahunOptions(profile.ormawa_id, profile.id);
+  const { rows, total, perPage } = await listProposalsOrmawa(
+    {
+      ormawaId: profile.ormawa_id,
+      status,
+      tahun,
+      page,
+    },
+    profile.id,
+  );
   const totalPages = Math.max(1, Math.ceil(total / perPage));
 
   const makePageUrl = (p: number) => {
@@ -98,7 +101,8 @@ export default async function OrmawaProposalsPage({
                     )}
                   </TableCell>
                   <TableCell className="text-sm whitespace-nowrap text-muted-foreground">
-                    {TANGGAL.format(new Date(p.tanggal_mulai))} — {TANGGAL.format(new Date(p.tanggal_selesai))}
+                    {TANGGAL.format(new Date(p.tanggal_mulai))} —{" "}
+                    {TANGGAL.format(new Date(p.tanggal_selesai))}
                   </TableCell>
                   <TableCell className="text-right whitespace-nowrap text-sm">
                     {RUPIAH.format(Number(p.anggaran_diajukan))}

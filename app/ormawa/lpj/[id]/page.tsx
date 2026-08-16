@@ -52,7 +52,11 @@ export default async function LpjPage({ params }: { params: Promise<{ id: string
 
   const dokumentasiLama = lpjRow
     ? await db
-        .select({ file_url: dokumentasiKegiatan.file_url, file_type: dokumentasiKegiatan.file_type, caption: dokumentasiKegiatan.caption })
+        .select({
+          file_url: dokumentasiKegiatan.file_url,
+          file_type: dokumentasiKegiatan.file_type,
+          caption: dokumentasiKegiatan.caption,
+        })
         .from(dokumentasiKegiatan)
         .where(eq(dokumentasiKegiatan.lpj_id, lpjRow.id))
     : [];
@@ -140,7 +144,8 @@ export default async function LpjPage({ params }: { params: Promise<{ id: string
 
       {!selesaiTerlewat && (
         <div className="rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-          LPJ dapat disubmit setelah tanggal selesai kegiatan ({TANGGAL.format(new Date(proposal.tanggal_selesai))}).
+          LPJ dapat disubmit setelah tanggal selesai kegiatan (
+          {TANGGAL.format(new Date(proposal.tanggal_selesai))}).
         </div>
       )}
 
@@ -152,7 +157,12 @@ export default async function LpjPage({ params }: { params: Promise<{ id: string
           lpjRow
             ? {
                 ringkasan: lpjRow.ringkasan_penggunaan_dana,
-                rincian: (lpjRow.rincian_pengeluaran as Array<{ item: string; jumlah: number; keterangan?: string }>) ?? [],
+                rincian:
+                  (lpjRow.rincian_pengeluaran as Array<{
+                    item: string;
+                    jumlah: number;
+                    keterangan?: string;
+                  }>) ?? [],
                 pdfUrl: lpjRow.file_lpj_url,
               }
             : undefined

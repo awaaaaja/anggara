@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getCurrentProfile } from "@/lib/auth/get-current-profile";
 import { listActivityActors, listActivityLogs } from "@/lib/db/queries/mpm";
 import { Button } from "@/components/ui/button";
 import { ActivityLogFilters } from "@/components/mpm/ActivityLogFilters";
@@ -21,13 +22,14 @@ export default async function MpmActivityLogPage({
   searchParams: Promise<{ role?: string; action?: string; page?: string }>;
 }) {
   const params = await searchParams;
+  const profile = await getCurrentProfile();
   const role = params.role ?? "semua";
   const action = params.action ?? "semua";
   const page = Math.max(1, Number(params.page) || 1);
 
   const [data, filters] = await Promise.all([
-    listActivityLogs({ actorRole: role, action, page }),
-    listActivityActors(),
+    listActivityLogs({ actorRole: role, action, page }, profile?.id),
+    listActivityActors(profile?.id),
   ]);
 
   const totalPages = Math.max(1, Math.ceil(data.total / data.perPage));
@@ -91,7 +93,9 @@ export default async function MpmActivityLogPage({
                 </TableCell>
                 <TableCell className="text-xs text-muted-foreground">
                   {row.targetTable}
-                  {(row.metadata as { email?: string } | null)?.email ? ` · ${(row.metadata as { email?: string } | null)?.email}` : ""}
+                  {(row.metadata as { email?: string } | null)?.email
+                    ? ` · ${(row.metadata as { email?: string } | null)?.email}`
+                    : ""}
                 </TableCell>
               </TableRow>
             ))}

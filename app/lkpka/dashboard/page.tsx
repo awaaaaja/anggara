@@ -15,23 +15,39 @@ export default async function LkpkaDashboardPage() {
   if (!profile) return null;
 
   const [summary, antrian] = await Promise.all([
-    applyAutoStatusTransitions().then(() => getLkpkaSummary()),
-    listProposalsForReview({ status: "diajukan", page: 1, perPage: 5 }),
+    applyAutoStatusTransitions().then(() => getLkpkaSummary(profile.id)),
+    listProposalsForReview({ status: "diajukan", page: 1, perPage: 5 }, profile.id),
   ]);
 
   const stats = [
-    { label: "Menunggu review", value: summary.menungguReview, href: "/lkpka/proposals?status=diajukan", icon: Hourglass, tone: "bg-amber-500/10 text-amber-600 dark:bg-amber-400/15 dark:text-amber-300" },
-    { label: "Disetujui bulan ini", value: summary.disetujuiBulanIni, href: "/lkpka/proposals?status=disetujui", icon: FileCheck2, tone: "bg-emerald-500/10 text-emerald-600 dark:bg-emerald-400/15 dark:text-emerald-300" },
-    { label: "LPJ menunggu", value: summary.lpjMenunggu, href: "/lkpka/lpj", icon: ClipboardCheck, tone: "bg-violet-500/10 text-violet-600 dark:bg-violet-400/15 dark:text-violet-300" },
+    {
+      label: "Menunggu review",
+      value: summary.menungguReview,
+      href: "/lkpka/proposals?status=diajukan",
+      icon: Hourglass,
+      tone: "bg-amber-500/10 text-amber-600 dark:bg-amber-400/15 dark:text-amber-300",
+    },
+    {
+      label: "Disetujui bulan ini",
+      value: summary.disetujuiBulanIni,
+      href: "/lkpka/proposals?status=disetujui",
+      icon: FileCheck2,
+      tone: "bg-emerald-500/10 text-emerald-600 dark:bg-emerald-400/15 dark:text-emerald-300",
+    },
+    {
+      label: "LPJ menunggu",
+      value: summary.lpjMenunggu,
+      href: "/lkpka/lpj",
+      icon: ClipboardCheck,
+      tone: "bg-violet-500/10 text-violet-600 dark:bg-violet-400/15 dark:text-violet-300",
+    },
   ];
 
   return (
     <div className="flex flex-col gap-6">
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Dashboard LKPKA</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Selamat datang, {profile.full_name}
-        </p>
+        <p className="mt-1 text-sm text-muted-foreground">Selamat datang, {profile.full_name}</p>
       </div>
 
       <LkpkaNav active="ringkasan" />
@@ -43,7 +59,9 @@ export default async function LkpkaDashboardPage() {
             href={s.href}
             className="group flex items-center gap-4 rounded-xl border p-5 transition-all duration-300 hover:border-foreground/20 hover:shadow-[0_8px_30px_-12px_rgba(0,0,0,0.15)] active:scale-[0.98]"
           >
-            <div className={`flex size-11 shrink-0 items-center justify-center rounded-xl ${s.tone}`}>
+            <div
+              className={`flex size-11 shrink-0 items-center justify-center rounded-xl ${s.tone}`}
+            >
               <s.icon className="size-5" />
             </div>
             <div className="min-w-0 flex-1">
@@ -62,7 +80,11 @@ export default async function LkpkaDashboardPage() {
         </CardHeader>
         <CardContent className="flex flex-col gap-1">
           {antrian.rows.length === 0 ? (
-            <EmptyState title="Tidak ada proposal menunggu review" description="Antrian kosong — semua sudah ditangani." className="py-8" />
+            <EmptyState
+              title="Tidak ada proposal menunggu review"
+              description="Antrian kosong — semua sudah ditangani."
+              className="py-8"
+            />
           ) : (
             antrian.rows.map((p) => (
               <Link
@@ -88,7 +110,11 @@ export default async function LkpkaDashboardPage() {
           <CardTitle className="text-base">Profil</CardTitle>
         </CardHeader>
         <CardContent>
-          <LogoUpload userId={profile.id} logoUrl={profile.logo_url} displayName={profile.full_name} />
+          <LogoUpload
+            userId={profile.id}
+            logoUrl={profile.logo_url}
+            displayName={profile.full_name}
+          />
         </CardContent>
       </Card>
     </div>

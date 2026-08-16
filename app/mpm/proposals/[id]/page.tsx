@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getCurrentProfile } from "@/lib/auth/get-current-profile";
 import { notFound } from "next/navigation";
 import { getProposalForReviewMpm } from "@/lib/db/queries/mpm";
 import { ProposalDetail } from "@/components/proposal/ProposalDetail";
@@ -13,7 +14,8 @@ export default async function MpmProposalDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const proposal = await getProposalForReviewMpm(id);
+  const profile = await getCurrentProfile();
+  const proposal = await getProposalForReviewMpm(id, profile?.id);
   if (!proposal) notFound();
 
   return (

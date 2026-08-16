@@ -10,7 +10,10 @@ export default async function MpmArsipPage() {
   const profile = await getCurrentProfile();
   if (!profile || profile.role !== "mpm") redirect("/login");
 
-  const [proposals, lpj] = await Promise.all([listArsipProposals(), listArsipLpj()]);
+  const [proposals, lpj] = await Promise.all([
+    listArsipProposals(profile?.id),
+    listArsipLpj(profile?.id),
+  ]);
 
   return (
     <div className="flex flex-col gap-6">

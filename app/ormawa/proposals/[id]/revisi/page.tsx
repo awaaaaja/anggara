@@ -7,16 +7,12 @@ import { OrmawaNav } from "@/components/shared/OrmawaNav";
 
 export const dynamic = "force-dynamic";
 
-export default async function RevisiProposalPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+export default async function RevisiProposalPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const profile = await getCurrentProfile();
   if (!profile || profile.role !== "ormawa" || !profile.ormawa_id) redirect("/login");
 
-  const proposal = await getProposalForOrmawa(id, profile.ormawa_id);
+  const proposal = await getProposalForOrmawa(id, profile.ormawa_id, profile.id);
   if (!proposal) notFound();
   if (proposal.status !== "revisi_diminta") redirect(`/ormawa/proposals/${id}`);
 

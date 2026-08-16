@@ -2,7 +2,7 @@
 
 import { eq } from "drizzle-orm";
 import { getCurrentProfile } from "@/lib/auth/get-current-profile";
-import { db, dbAsUser } from "@/lib/db/client";
+import { db, dbAsUser, queryAs } from "@/lib/db/client";
 import { lpj, proposals } from "@/lib/db/schema";
 import { logActivity } from "@/lib/db/queries/activity-log";
 
@@ -14,11 +14,13 @@ async function guardLkpkaLpjReview(proposalId: string) {
   if (profile.role !== "lkpka") {
     return { ok: false as const, error: "Hanya LKPKA yang dapat mereview LPJ." };
   }
-  const [lpjRow] = await db
-    .select({ id: lpj.id, proposal_id: lpj.proposal_id, status: lpj.status })
-    .from(lpj)
-    .where(eq(lpj.proposal_id, proposalId))
-    .limit(1);
+  const [lpjRow] = await queryAs(profile.id, async (q) => {
+    return q
+      .select({ id: lpj.id, proposal_id: lpj.proposal_id, status: lpj.status })
+      .from(lpj)
+      .where(eq(lpj.proposal_id, proposalId))
+      .limit(1);
+  });
   if (!lpjRow) return { ok: false as const, error: "LPJ belum disubmit." };
   if (!["menunggu", "revisi_diminta"].includes(lpjRow.status)) {
     return { ok: false as const, error: "LPJ sudah diproses." };

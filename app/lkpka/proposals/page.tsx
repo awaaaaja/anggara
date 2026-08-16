@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getCurrentProfile } from "@/lib/auth/get-current-profile";
 import { listOrmawaOptions, listProposalsForReview } from "@/lib/db/queries/lkpka";
 import { PdfPreviewDialog } from "@/components/shared/PdfPreviewDialog";
 import { FilterBar } from "@/components/proposal/FilterBar";
@@ -23,13 +24,14 @@ export default async function LkpkaProposalsPage({
   searchParams: Promise<{ status?: string; ormawa?: string; page?: string }>;
 }) {
   const params = await searchParams;
+  const profile = await getCurrentProfile();
   const status = params.status ?? "semua";
   const ormawaId = params.ormawa ?? "semua";
   const page = Math.max(1, Number(params.page) || 1);
 
   const [data, ormawaOptions] = await Promise.all([
-    listProposalsForReview({ status, ormawaId, page }),
-    listOrmawaOptions(),
+    listProposalsForReview({ status, ormawaId, page }, profile?.id),
+    listOrmawaOptions(profile?.id),
   ]);
 
   const totalPages = Math.max(1, Math.ceil(data.total / data.perPage));
@@ -47,7 +49,8 @@ export default async function LkpkaProposalsPage({
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Proposal</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          {data.total} proposal ditemukan · {STATUS_PROPOSAL_LABEL[status as keyof typeof STATUS_PROPOSAL_LABEL] ?? "Semua status"}
+          {data.total} proposal ditemukan ·{" "}
+          {STATUS_PROPOSAL_LABEL[status as keyof typeof STATUS_PROPOSAL_LABEL] ?? "Semua status"}
         </p>
       </div>
 
@@ -69,7 +72,10 @@ export default async function LkpkaProposalsPage({
             <TableBody>
               {data.rows.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={4} className="py-10 text-center text-sm text-muted-foreground">
+                  <TableCell
+                    colSpan={4}
+                    className="py-10 text-center text-sm text-muted-foreground"
+                  >
                     Tidak ada proposal dengan filter ini.
                   </TableCell>
                 </TableRow>
@@ -77,10 +83,14 @@ export default async function LkpkaProposalsPage({
                 data.rows.map((p) => (
                   <TableRow key={p.id}>
                     <TableCell>
-                      <Link href={`/lkpka/proposals/${p.id}/review`} className="block hover:underline">
+                      <Link
+                        href={`/lkpka/proposals/${p.id}/review`}
+                        className="block hover:underline"
+                      >
                         <span className="font-medium">{p.judul_kegiatan}</span>
                         <span className="block text-xs text-muted-foreground">
-                          {TANGGAL.format(new Date(p.tanggal_mulai))} — {TANGGAL.format(new Date(p.tanggal_selesai))}
+                          {TANGGAL.format(new Date(p.tanggal_mulai))} —{" "}
+                          {TANGGAL.format(new Date(p.tanggal_selesai))}
                         </span>
                       </Link>
                       {p.file_proposal_url && (

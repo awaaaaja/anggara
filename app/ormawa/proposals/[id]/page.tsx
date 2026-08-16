@@ -11,18 +11,14 @@ import { ACTION_LABEL, TANGGAL } from "@/lib/constants";
 
 export const dynamic = "force-dynamic";
 
-export default async function ProposalDetailPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+export default async function ProposalDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const profile = await getCurrentProfile();
   if (!profile || profile.role !== "ormawa" || !profile.ormawa_id) redirect("/login");
 
   const [proposal, timeline] = await Promise.all([
-    getProposalForOrmawa(id, profile.ormawa_id),
-    getProposalTimeline(id, profile.ormawa_id),
+    getProposalForOrmawa(id, profile.ormawa_id, profile.id),
+    getProposalTimeline(id, profile.ormawa_id, profile.id),
   ]);
   if (!proposal) notFound();
 
@@ -74,7 +70,9 @@ export default async function ProposalDetailPage({
                 <li key={i} className="flex gap-3">
                   <div className="flex flex-col items-center">
                     <span className="mt-1 size-2 shrink-0 rounded-full bg-primary" aria-hidden />
-                    {i < timeline.length - 1 && <span className="h-full w-px bg-border" aria-hidden />}
+                    {i < timeline.length - 1 && (
+                      <span className="h-full w-px bg-border" aria-hidden />
+                    )}
                   </div>
                   <div className="pb-1">
                     <p className="text-sm">{ACTION_LABEL[t.action] ?? t.action}</p>

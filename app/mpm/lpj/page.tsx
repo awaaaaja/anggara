@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getCurrentProfile } from "@/lib/auth/get-current-profile";
 import { listLpjGallery } from "@/lib/db/queries/mpm";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { Button } from "@/components/ui/button";
@@ -15,7 +16,13 @@ export default async function MpmLpjPage({
   searchParams: Promise<{ page?: string }>;
 }) {
   const page = Math.max(1, Number((await searchParams).page) || 1);
-  const { rows: gallery, total, page: currentPage, perPage } = await listLpjGallery({ page });
+  const profile = await getCurrentProfile();
+  const {
+    rows: gallery,
+    total,
+    page: currentPage,
+    perPage,
+  } = await listLpjGallery({ page }, profile?.id);
   const totalPages = Math.max(1, Math.ceil(total / perPage));
 
   return (
@@ -54,14 +61,18 @@ export default async function MpmLpjPage({
                 <div className="grid grid-cols-2 gap-2 text-sm">
                   <div className="rounded-lg bg-muted px-3 py-2">
                     <p className="text-xs text-muted-foreground">Disetujui</p>
-                    <p className="font-semibold">{RUPIAH.format(Number(g.nominalDisetujui ?? 0))}</p>
+                    <p className="font-semibold">
+                      {RUPIAH.format(Number(g.nominalDisetujui ?? 0))}
+                    </p>
                   </div>
                   <div className="rounded-lg bg-muted px-3 py-2">
                     <p className="text-xs text-muted-foreground">Realisasi</p>
                     <p className="font-semibold">{RUPIAH.format(Number(g.totalRealisasi))}</p>
                   </div>
                 </div>
-                <p className={`text-xs ${selisih >= 0 ? "text-emerald-700 dark:text-emerald-400" : "text-red-700 dark:text-red-400"}`}>
+                <p
+                  className={`text-xs ${selisih >= 0 ? "text-emerald-700 dark:text-emerald-400" : "text-red-700 dark:text-red-400"}`}
+                >
                   {selisih >= 0 ? "Sisa" : "Selisih kurang"}: {RUPIAH.format(Math.abs(selisih))}
                 </p>
 
@@ -76,25 +87,32 @@ export default async function MpmLpjPage({
                         </tr>
                       </thead>
                       <tbody>
-                        {rincian.map((r: { item?: string; jumlah?: string | number; keterangan?: string }, i: number) => (
-                          <tr key={i} className="border-t">
-                            <td className="px-3 py-2">{r.item}</td>
-                            <td className="px-3 py-2">{RUPIAH.format(Number(r.jumlah ?? 0))}</td>
-                            <td className="px-3 py-2 text-muted-foreground">{r.keterangan ?? "—"}</td>
-                          </tr>
-                        ))}
+                        {rincian.map(
+                          (
+                            r: { item?: string; jumlah?: string | number; keterangan?: string },
+                            i: number,
+                          ) => (
+                            <tr key={i} className="border-t">
+                              <td className="px-3 py-2">{r.item}</td>
+                              <td className="px-3 py-2">{RUPIAH.format(Number(r.jumlah ?? 0))}</td>
+                              <td className="px-3 py-2 text-muted-foreground">
+                                {r.keterangan ?? "—"}
+                              </td>
+                            </tr>
+                          ),
+                        )}
                       </tbody>
                     </table>
                   </div>
                 )}
 
-                {g.fileLpjUrl && (
-                  <PdfPreviewDialog url={g.fileLpjUrl} label="Buka PDF LPJ" />
-                )}
+                {g.fileLpjUrl && <PdfPreviewDialog url={g.fileLpjUrl} label="Buka PDF LPJ" />}
 
                 {g.dokumentasi.length > 0 && (
                   <div>
-                    <p className="mb-2 text-xs font-medium text-muted-foreground">Dokumentasi ({g.dokumentasi.length})</p>
+                    <p className="mb-2 text-xs font-medium text-muted-foreground">
+                      Dokumentasi ({g.dokumentasi.length})
+                    </p>
                     <div className="grid grid-cols-3 gap-2">
                       {g.dokumentasi
                         .filter((d) => d.fileType === "foto")

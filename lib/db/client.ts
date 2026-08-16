@@ -12,6 +12,7 @@ export const db = drizzle(pool, { schema });
 
 export type Db = typeof db;
 export type DbTx = Parameters<Parameters<typeof db.transaction>[0]>[0];
+export type Queryable = Db | DbTx;
 
 /**
  * Jalankan fungsi dalam transaksi dengan identitas user sesi (RLS aktif).
@@ -26,4 +27,15 @@ export async function dbAsUser<T>(userId: string, fn: (tx: DbTx) => Promise<T>):
     );
     return fn(tx);
   });
+}
+
+/**
+ * Jalankan query sebagai user sesi bila userId diberikan (RLS aktif),
+ * atau sebagai service role bila tidak (system/tanpa sesi).
+ */
+export function queryAs<T>(
+  userId: string | null | undefined,
+  fn: (q: Queryable) => Promise<T>,
+): Promise<T> {
+  return userId ? dbAsUser(userId, fn) : fn(db);
 }

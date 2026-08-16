@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getCurrentProfile } from "@/lib/auth/get-current-profile";
 import { listAllProposals } from "@/lib/db/queries/mpm";
 import { listOrmawaOptions } from "@/lib/db/queries/lkpka";
 import { PdfPreviewDialog } from "@/components/shared/PdfPreviewDialog";
@@ -21,9 +22,16 @@ export const dynamic = "force-dynamic";
 export default async function MpmProposalsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ status?: string; ormawa?: string; dari?: string; sampai?: string; page?: string }>;
+  searchParams: Promise<{
+    status?: string;
+    ormawa?: string;
+    dari?: string;
+    sampai?: string;
+    page?: string;
+  }>;
 }) {
   const params = await searchParams;
+  const profile = await getCurrentProfile();
   const status = params.status ?? "semua";
   const ormawaId = params.ormawa ?? "semua";
   const dari = params.dari ?? "semua";
@@ -32,7 +40,7 @@ export default async function MpmProposalsPage({
 
   const [data, ormawaOptions] = await Promise.all([
     listAllProposals({ status, ormawaId, dari, sampai, page }),
-    listOrmawaOptions(),
+    listOrmawaOptions(profile?.id),
   ]);
 
   const totalPages = Math.max(1, Math.ceil(data.total / data.perPage));
@@ -93,7 +101,8 @@ export default async function MpmProposalsPage({
                 <TableCell className="max-w-xs">
                   <p className="truncate font-medium">{p.judul_kegiatan}</p>
                   <p className="text-xs text-muted-foreground">
-                    {TANGGAL.format(new Date(p.tanggal_mulai))} — {TANGGAL.format(new Date(p.tanggal_selesai))}
+                    {TANGGAL.format(new Date(p.tanggal_mulai))} —{" "}
+                    {TANGGAL.format(new Date(p.tanggal_selesai))}
                   </p>
                   {p.file_proposal_url && (
                     <div className="mt-1">
@@ -105,7 +114,9 @@ export default async function MpmProposalsPage({
                 <TableCell>
                   <StatusBadge status={p.status} />
                 </TableCell>
-                <TableCell className="text-right text-sm">{RUPIAH.format(Number(p.anggaran_diajukan))}</TableCell>
+                <TableCell className="text-right text-sm">
+                  {RUPIAH.format(Number(p.anggaran_diajukan))}
+                </TableCell>
                 <TableCell className="text-sm text-muted-foreground">
                   {TANGGAL.format(new Date(p.created_at))}
                 </TableCell>

@@ -21,7 +21,7 @@ export default async function OrmawaLpjPage() {
   const profile = await getCurrentProfile();
   if (!profile || profile.role !== "ormawa" || !profile.ormawa_id) redirect("/login");
 
-  const rows = await listLpjOrmawa(profile.ormawa_id);
+  const rows = await listLpjOrmawa(profile.ormawa_id, profile.id);
   const denganLpj = rows.filter((r) => r.lpjStatus);
 
   return (

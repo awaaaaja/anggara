@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getCurrentProfile } from "@/lib/auth/get-current-profile";
 import { listLpjTracking } from "@/lib/db/queries/lkpka";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { LkpkaNav } from "@/components/shared/LkpkaNav";
@@ -13,7 +14,8 @@ export default async function LkpkaLpjPage({
   searchParams: Promise<{ page?: string }>;
 }) {
   const page = Math.max(1, Number((await searchParams).page) || 1);
-  const { rows, total, page: currentPage, perPage } = await listLpjTracking({ page });
+  const profile = await getCurrentProfile();
+  const { rows, total, page: currentPage, perPage } = await listLpjTracking({ page }, profile?.id);
   const totalPages = Math.max(1, Math.ceil(total / perPage));
   const hariTerlambat = (tanggalSelesai: Date) => {
     const start = new Date(tanggalSelesai);
@@ -50,7 +52,9 @@ export default async function LkpkaLpjPage({
                 <p className="truncate text-sm font-medium">{r.judul_kegiatan}</p>
                 <p className="mt-0.5 text-xs text-muted-foreground">
                   {r.ormawaNama} · Jatuh tempo {TANGGAL.format(new Date(r.tanggal_selesai))}
-                  {r.lpjStatus === "revisi_diminta" && <span className="ml-2">· LPJ sedang direvisi ormawa</span>}
+                  {r.lpjStatus === "revisi_diminta" && (
+                    <span className="ml-2">· LPJ sedang direvisi ormawa</span>
+                  )}
                 </p>
               </div>
               <div className="flex shrink-0 flex-col items-end gap-1">

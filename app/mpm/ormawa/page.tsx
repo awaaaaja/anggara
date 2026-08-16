@@ -1,4 +1,5 @@
 import { listOrmawaAdmin } from "@/lib/db/queries/mpm";
+import { getCurrentProfile } from "@/lib/auth/get-current-profile";
 import Link from "next/link";
 import { OrmawaFormDialog } from "@/components/mpm/OrmawaFormDialog";
 import { OrmawaStatusToggle } from "@/components/mpm/OrmawaStatusToggle";
@@ -37,7 +38,13 @@ export default async function MpmOrmawaPage({
   searchParams: Promise<{ page?: string }>;
 }) {
   const page = Math.max(1, Number((await searchParams).page) || 1);
-  const { rows: ormawaList, total, page: currentPage, perPage } = await listOrmawaAdmin({ page });
+  const profile = await getCurrentProfile();
+  const {
+    rows: ormawaList,
+    total,
+    page: currentPage,
+    perPage,
+  } = await listOrmawaAdmin({ page }, profile?.id);
   const totalPages = Math.max(1, Math.ceil(total / perPage));
 
   return (
@@ -81,7 +88,9 @@ export default async function MpmOrmawaPage({
                 <TableCell>
                   <StatusOrmawaBadge status={o.status} />
                 </TableCell>
-                <TableCell className="text-sm text-muted-foreground">{TANGGAL.format(new Date(o.created_at))}</TableCell>
+                <TableCell className="text-sm text-muted-foreground">
+                  {TANGGAL.format(new Date(o.created_at))}
+                </TableCell>
                 <TableCell className="text-right">
                   <OrmawaStatusToggle ormawaId={o.id} status={o.status} />
                 </TableCell>

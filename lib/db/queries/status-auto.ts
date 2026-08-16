@@ -68,10 +68,7 @@ export async function applyAutoStatusTransitions() {
         .update(proposals)
         .set({ status: "lpj_menunggu" })
         .where(
-          and(
-            eq(proposals.status, "kegiatan_berlangsung"),
-            lte(proposals.tanggal_selesai, today),
-          ),
+          and(eq(proposals.status, "kegiatan_berlangsung"), lte(proposals.tanggal_selesai, today)),
         );
       await logTransitions(tx, menunggu, "proposal.auto_lpj_menunggu", actor.id);
     }
@@ -85,14 +82,8 @@ export async function applyAutoStatusTransitions() {
 export async function getNotificationBadges(role: "lkpka" | "ormawa", ormawaId?: string | null) {
   if (role === "lkpka") {
     const [[proposal], [lpjReview]] = await Promise.all([
-      db
-        .select({ total: count() })
-        .from(proposals)
-        .where(eq(proposals.status, "diajukan")),
-      db
-        .select({ total: count() })
-        .from(proposals)
-        .where(eq(proposals.status, "lpj_direview")),
+      db.select({ total: count() }).from(proposals).where(eq(proposals.status, "diajukan")),
+      db.select({ total: count() }).from(proposals).where(eq(proposals.status, "lpj_direview")),
     ]);
     return { proposal: proposal.total, lpj: lpjReview.total };
   }

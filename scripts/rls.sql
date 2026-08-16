@@ -224,6 +224,28 @@ drop policy if exists actor_select_own_activity_logs on public.activity_logs;
 create policy actor_select_own_activity_logs on public.activity_logs
   for select using (actor_id = auth.uid());
 
+-- ORMAWA: log miliknya sendiri + log proposal/LPJ milik organisasinya
+-- (agar riwayat/timeline proposal tetap lengkap saat RLS select aktif)
+drop policy if exists ormawa_select_related_activity_logs on public.activity_logs;
+create policy ormawa_select_related_activity_logs on public.activity_logs
+  for select using (
+    get_user_role() = 'ormawa'
+    and (
+      actor_id = auth.uid()
+      or (
+        target_table = 'proposals'
+        and target_id in (select id from proposals where ormawa_id = get_user_ormawa_id())
+      )
+      or (
+        target_table = 'lpj'
+        and target_id in (
+          select l.id from lpj l
+          where l.proposal_id in (select id from proposals where ormawa_id = get_user_ormawa_id())
+        )
+      )
+    )
+  );
+
 -- insert: siapa saja yang terautentikasi (via server action)
 drop policy if exists authenticated_insert_activity_logs on public.activity_logs;
 create policy authenticated_insert_activity_logs on public.activity_logs

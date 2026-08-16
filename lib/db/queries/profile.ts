@@ -10,7 +10,8 @@ const logoUrlSchema = z.object({
     .string()
     .url("URL tidak valid")
     .refine(
-      (url) => url.startsWith(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/logo/`),
+      (url) =>
+        url.startsWith(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/logo/`),
       "URL harus dari bucket logo",
     ),
 });
