@@ -34,6 +34,7 @@ export const STATUS_LPJ_LABEL: Record<StatusLpj, string> = {
 };
 
 export const ACTION_LABEL: Record<string, string> = {
+  "proposal.draft": "Menyimpan draft proposal",
   "proposal.submit": "Mengajukan proposal",
   "proposal.resubmit": "Mengajukan revisi proposal",
   "proposal.approve": "Menyetujui proposal",
