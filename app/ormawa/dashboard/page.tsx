@@ -1,10 +1,12 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import { FileText, Flag, RotateCcw, Activity, XCircle, CheckCircle2 } from "lucide-react";
 import { getCurrentProfile } from "@/lib/auth/get-current-profile";
 import { getOrmawaSummary } from "@/lib/db/queries/ormawa";
 import { applyAutoStatusTransitions } from "@/lib/db/queries/status-auto";
 import { LogoUpload } from "@/components/shared/LogoUpload";
 import { OrmawaNav } from "@/components/shared/OrmawaNav";
+import { EmptyState } from "@/components/shared/EmptyState";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { Button } from "@/components/ui/button";
 import {
@@ -27,12 +29,12 @@ export default async function OrmawaDashboardPage() {
   const summary = await applyAutoStatusTransitions().then(() => getOrmawaSummary(profile.ormawa_id!));
 
   const stats = [
-    { label: "Draft", value: summary.draft, href: "/ormawa/proposals?status=draft" },
-    { label: "Menunggu review", value: summary.menungguReview, href: "/ormawa/proposals?status=diajukan" },
-    { label: "Revisi diminta", value: summary.revisiDiminta, href: "/ormawa/proposals?status=revisi_diminta" },
-    { label: "Berjalan", value: summary.berjalan, href: "/ormawa/proposals?status=disetujui" },
-    { label: "Ditolak", value: summary.ditolak, href: "/ormawa/proposals?status=ditolak" },
-    { label: "Selesai", value: summary.selesai, href: "/ormawa/proposals?status=selesai" },
+    { label: "Draft", value: summary.draft, href: "/ormawa/proposals?status=draft", icon: FileText, tone: "text-zinc-500 dark:text-zinc-400" },
+    { label: "Menunggu review", value: summary.menungguReview, href: "/ormawa/proposals?status=diajukan", icon: Flag, tone: "text-amber-600 dark:text-amber-400" },
+    { label: "Revisi diminta", value: summary.revisiDiminta, href: "/ormawa/proposals?status=revisi_diminta", icon: RotateCcw, tone: "text-orange-600 dark:text-orange-400" },
+    { label: "Berjalan", value: summary.berjalan, href: "/ormawa/proposals?status=disetujui", icon: Activity, tone: "text-sky-600 dark:text-sky-400" },
+    { label: "Ditolak", value: summary.ditolak, href: "/ormawa/proposals?status=ditolak", icon: XCircle, tone: "text-red-600 dark:text-red-400" },
+    { label: "Selesai", value: summary.selesai, href: "/ormawa/proposals?status=selesai", icon: CheckCircle2, tone: "text-emerald-600 dark:text-emerald-400" },
   ];
 
   return (
@@ -70,9 +72,10 @@ export default async function OrmawaDashboardPage() {
         {stats.map((s) => (
           <Link key={s.label} href={s.href}>
             <Card className="h-full transition-colors hover:border-foreground/40">
-              <CardContent className="p-4">
+              <CardContent className="flex flex-col gap-2 p-4">
+                <s.icon className={`size-4 ${s.tone}`} />
                 <p className="text-2xl font-bold tracking-tight">{s.value}</p>
-                <p className="mt-1 text-xs text-muted-foreground">{s.label}</p>
+                <p className="text-xs text-muted-foreground">{s.label}</p>
               </CardContent>
             </Card>
           </Link>
@@ -87,9 +90,16 @@ export default async function OrmawaDashboardPage() {
           </Button>
         </div>
         {summary.proposalTerkini.length === 0 ? (
-          <div className="rounded-lg border px-4 py-10 text-center text-sm text-muted-foreground">
-            Belum ada proposal. Ajukan kegiatan pertama Anda.
-          </div>
+          <EmptyState
+            icon={FileText}
+            title="Belum ada proposal"
+            description="Ajukan kegiatan pertama organisasi Anda."
+            action={
+              <Button asChild size="sm">
+                <Link href="/ormawa/proposals/baru">Ajukan proposal</Link>
+              </Button>
+            }
+          />
         ) : (
           <div className="flex flex-col divide-y rounded-lg border">
             {summary.proposalTerkini.map((p) => (

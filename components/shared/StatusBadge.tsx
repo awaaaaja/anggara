@@ -19,10 +19,29 @@ const badgeVariant: Record<string, string> = {
     "border-violet-300 bg-violet-50 text-violet-700 dark:border-violet-400/40 dark:bg-violet-400/10 dark:text-violet-300",
 };
 
+const dotVariant: Record<string, string> = {
+  zinc: "bg-zinc-400 dark:bg-zinc-500",
+  amber: "bg-amber-500 dark:bg-gold",
+  orange: "bg-orange-500",
+  red: "bg-red-500",
+  emerald: "bg-emerald-500",
+  sky: "bg-sky-500",
+  blue: "bg-blue-500",
+  green: "bg-green-500",
+  violet: "bg-violet-500",
+};
+
 export function StatusBadge({ status }: { status: StatusProposal }) {
-  const variant = badgeVariant[STATUS_PROPOSAL_BADGE[status]] ?? badgeVariant.zinc;
+  const variant = STATUS_PROPOSAL_BADGE[status] ?? "zinc";
   return (
-    <Badge variant="outline" className={`${variant} border font-medium backdrop-blur-sm`}>
+    <Badge
+      variant="outline"
+      className={`${badgeVariant[variant] ?? badgeVariant.zinc} inline-flex items-center gap-1.5 border font-medium backdrop-blur-sm`}
+    >
+      <span
+        aria-hidden
+        className={`size-1.5 shrink-0 rounded-full ${dotVariant[variant] ?? dotVariant.zinc}`}
+      />
       {STATUS_PROPOSAL_LABEL[status]}
     </Badge>
   );

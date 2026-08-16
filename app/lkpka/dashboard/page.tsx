@@ -1,11 +1,12 @@
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, ClipboardCheck, FileCheck2, Hourglass } from "lucide-react";
 import { getCurrentProfile } from "@/lib/auth/get-current-profile";
 import { getLkpkaSummary, listProposalsForReview } from "@/lib/db/queries/lkpka";
 import { applyAutoStatusTransitions } from "@/lib/db/queries/status-auto";
 import { LogoUpload } from "@/components/shared/LogoUpload";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { LkpkaNav } from "@/components/shared/LkpkaNav";
+import { EmptyState } from "@/components/shared/EmptyState";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { TANGGAL } from "@/lib/constants";
 
@@ -19,9 +20,9 @@ export default async function LkpkaDashboardPage() {
   ]);
 
   const stats = [
-    { label: "Menunggu review", value: summary.menungguReview, href: "/lkpka/proposals?status=diajukan" },
-    { label: "Disetujui bulan ini", value: summary.disetujuiBulanIni, href: "/lkpka/proposals?status=disetujui" },
-    { label: "LPJ menunggu", value: summary.lpjMenunggu, href: "/lkpka/lpj" },
+    { label: "Menunggu review", value: summary.menungguReview, href: "/lkpka/proposals?status=diajukan", icon: Hourglass, tone: "bg-amber-500/10 text-amber-600 dark:bg-amber-400/15 dark:text-amber-300" },
+    { label: "Disetujui bulan ini", value: summary.disetujuiBulanIni, href: "/lkpka/proposals?status=disetujui", icon: FileCheck2, tone: "bg-emerald-500/10 text-emerald-600 dark:bg-emerald-400/15 dark:text-emerald-300" },
+    { label: "LPJ menunggu", value: summary.lpjMenunggu, href: "/lkpka/lpj", icon: ClipboardCheck, tone: "bg-violet-500/10 text-violet-600 dark:bg-violet-400/15 dark:text-violet-300" },
   ];
 
   return (
@@ -40,11 +41,16 @@ export default async function LkpkaDashboardPage() {
           <Link
             key={s.label}
             href={s.href}
-            className="group flex flex-col gap-1 rounded-xl border p-5 transition-all duration-300 hover:border-foreground/20 hover:shadow-[0_8px_30px_-12px_rgba(0,0,0,0.15)] active:scale-[0.98]"
+            className="group flex items-center gap-4 rounded-xl border p-5 transition-all duration-300 hover:border-foreground/20 hover:shadow-[0_8px_30px_-12px_rgba(0,0,0,0.15)] active:scale-[0.98]"
           >
-            <span className="text-3xl font-bold tracking-tight tabular-nums">{s.value}</span>
-            <span className="text-sm text-muted-foreground">{s.label}</span>
-            <ArrowRight className="mt-1 size-4 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
+            <div className={`flex size-11 shrink-0 items-center justify-center rounded-xl ${s.tone}`}>
+              <s.icon className="size-5" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-2xl font-bold tracking-tight tabular-nums">{s.value}</p>
+              <p className="truncate text-sm text-muted-foreground">{s.label}</p>
+            </div>
+            <ArrowRight className="size-4 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
           </Link>
         ))}
       </div>
@@ -56,9 +62,7 @@ export default async function LkpkaDashboardPage() {
         </CardHeader>
         <CardContent className="flex flex-col gap-1">
           {antrian.rows.length === 0 ? (
-            <p className="py-6 text-center text-sm text-muted-foreground">
-              Tidak ada proposal menunggu review.
-            </p>
+            <EmptyState title="Tidak ada proposal menunggu review" description="Antrian kosong — semua sudah ditangani." className="py-8" />
           ) : (
             antrian.rows.map((p) => (
               <Link
