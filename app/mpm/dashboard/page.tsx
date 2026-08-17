@@ -75,7 +75,7 @@ export default async function MpmDashboardPage() {
               </div>
               <div className="min-w-0">
                 <p className="truncate text-sm text-muted-foreground">{s.label}</p>
-                <p className="text-2xl font-bold tracking-tight tabular-nums">{s.value}</p>
+                <p className="text-2xl font-bold tracking-tight tabular-nums lg:text-xl">{s.value}</p>
               </div>
             </CardContent>
           </Card>
