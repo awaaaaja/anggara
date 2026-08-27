@@ -24,7 +24,16 @@ const routes = [
         name: "mpm.dashboard",
         component: () => import("@/features/dashboard/pages/MpmDashboardPage.vue"),
       },
-      { path: "proposals", name: "mpm.proposals", component: Placeholder },
+      {
+        path: "proposals",
+        name: "mpm.proposals",
+        component: () => import("@/features/proposals/pages/MpmProposalsPage.vue"),
+      },
+      {
+        path: "proposals/:id",
+        name: "mpm.proposals.detail",
+        component: () => import("@/features/proposals/components/ProposalDetail.vue"),
+      },
       { path: "lpj", name: "mpm.lpj", component: Placeholder },
       { path: "budget", name: "mpm.budget", component: Placeholder },
       { path: "ormawa", name: "mpm.ormawa", component: Placeholder },
@@ -53,8 +62,16 @@ const routes = [
       },
       { path: "reviews/lpj", name: "lkpka.reviews.lpj", component: Placeholder },
       { path: "reviews/lpj/:id", name: "lkpka.reviews.lpj.detail", component: Placeholder },
-      { path: "proposals", name: "lkpka.proposals", component: Placeholder },
-      { path: "proposals/:id", name: "lkpka.proposals.detail", component: Placeholder },
+      {
+        path: "proposals",
+        name: "lkpka.proposals",
+        component: () => import("@/features/proposals/pages/LkpkaProposalsPage.vue"),
+      },
+      {
+        path: "proposals/:id",
+        name: "lkpka.proposals.detail",
+        component: () => import("@/features/proposals/components/ProposalDetail.vue"),
+      },
       { path: "lpj", name: "lkpka.lpj", component: Placeholder },
       { path: "lpj/:id", name: "lkpka.lpj.detail", component: Placeholder },
       { path: "budget", name: "lkpka.budget", component: Placeholder },
@@ -77,9 +94,17 @@ const routes = [
       {
         path: "proposals",
         children: [
-          { path: "", name: "ormawa.proposals", component: Placeholder },
+          {
+            path: "",
+            name: "ormawa.proposals",
+            component: () => import("@/features/proposals/pages/OrmawaProposalsPage.vue"),
+          },
           { path: "new", name: "ormawa.proposals.new", component: Placeholder },
-          { path: ":id", name: "ormawa.proposals.detail", component: Placeholder },
+          {
+            path: ":id",
+            name: "ormawa.proposals.detail",
+            component: () => import("@/features/proposals/components/ProposalDetail.vue"),
+          },
           { path: ":id/edit", name: "ormawa.proposals.edit", component: Placeholder },
           { path: ":id/history", name: "ormawa.proposals.history", component: Placeholder },
         ],
