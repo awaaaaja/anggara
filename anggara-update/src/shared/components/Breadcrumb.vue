@@ -14,7 +14,6 @@ const crumbs = computed(() => {
   for (const group of navByRole[role] || []) {
     for (const item of group.items) {
       if (route.path === item.to || route.path.startsWith(item.to + "/")) {
-        if (group.section) out.push({ label: group.section });
         out.push({ label: item.label, to: item.to });
         return out;
       }
@@ -27,11 +26,14 @@ const crumbs = computed(() => {
 <template>
   <nav aria-label="Breadcrumb" class="min-w-0">
     <ol class="flex items-center gap-1.5 text-sm text-text-muted">
-      <li v-for="(c, i) in crumbs" :key="c.to + i" class="flex min-w-0 items-center gap-1.5">
+      <li v-for="(c, i) in crumbs" :key="c.label + i" class="flex min-w-0 items-center gap-1.5">
         <ChevronRight v-if="i > 0" class="size-4 shrink-0" aria-hidden="true" />
-        <RouterLink v-if="i < crumbs.length - 1" :to="c.to" class="truncate hover:text-text">{{
-          c.label
-        }}</RouterLink>
+        <RouterLink
+          v-if="c.to && i < crumbs.length - 1"
+          :to="c.to"
+          class="truncate hover:text-text"
+          >{{ c.label }}</RouterLink
+        >
         <span v-else class="truncate font-medium text-text" aria-current="page">{{ c.label }}</span>
       </li>
     </ol>

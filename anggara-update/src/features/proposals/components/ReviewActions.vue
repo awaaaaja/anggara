@@ -25,7 +25,7 @@ const props = defineProps({
 });
 
 const auth = useAuthStore();
-const review = useReviewProposal();
+const { mutate: reviewMutate, isPending } = useReviewProposal();
 const open = ref(null);
 
 const canReview = computed(() => auth.role === "lkpka" && props.proposal.status === "diajukan");
@@ -84,7 +84,7 @@ function onOpenChange(val) {
 }
 
 const onApprove = submitApprove((values) => {
-  review.mutate(
+  reviewMutate(
     {
       id: props.proposal.id,
       action: "approve",
@@ -95,13 +95,13 @@ const onApprove = submitApprove((values) => {
   );
 });
 const onReject = submitReject((values) => {
-  review.mutate(
+  reviewMutate(
     { id: props.proposal.id, action: "reject", catatan: values.catatan },
     { onSuccess: () => (open.value = null) },
   );
 });
 const onRevision = submitRevision((values) => {
-  review.mutate(
+  reviewMutate(
     { id: props.proposal.id, action: "revision", catatan: values.catatan },
     { onSuccess: () => (open.value = null) },
   );
@@ -152,7 +152,7 @@ const onRevision = submitRevision((values) => {
           <DialogClose as-child>
             <Button variant="outline">Batal</Button>
           </DialogClose>
-          <Button type="submit" form="approve-form" :disabled="review.isPending">
+          <Button type="submit" form="approve-form" :disabled="isPending">
             <Check class="mr-1 size-4" /> Setujui
           </Button>
         </DialogFooter>
@@ -184,12 +184,7 @@ const onRevision = submitRevision((values) => {
           <DialogClose as-child>
             <Button variant="outline">Batal</Button>
           </DialogClose>
-          <Button
-            type="submit"
-            form="reject-form"
-            variant="destructive"
-            :disabled="review.isPending"
-          >
+          <Button type="submit" form="reject-form" variant="destructive" :disabled="isPending">
             <X class="mr-1 size-4" /> Tolak
           </Button>
         </DialogFooter>
@@ -223,7 +218,7 @@ const onRevision = submitRevision((values) => {
           <DialogClose as-child>
             <Button variant="outline">Batal</Button>
           </DialogClose>
-          <Button type="submit" form="revision-form" :disabled="review.isPending">
+          <Button type="submit" form="revision-form" :disabled="isPending">
             <Pencil class="mr-1 size-4" /> Kirim Revisi
           </Button>
         </DialogFooter>

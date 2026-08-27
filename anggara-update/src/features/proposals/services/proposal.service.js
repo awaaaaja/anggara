@@ -98,3 +98,65 @@ export async function reviewProposal({ id, action, nominal, catatan }) {
 
   return { status: newStatus };
 }
+
+export async function createProposal({ ormawaId, values }) {
+  const { data, error } = await supabase
+    .from("proposals")
+    .insert({
+      ormawa_id: ormawaId,
+      judul_kegiatan: values.judul_kegiatan,
+      deskripsi: values.deskripsi,
+      tujuan_kegiatan: values.tujuan_kegiatan,
+      tanggal_mulai: values.tanggal_mulai,
+      tanggal_selesai: values.tanggal_selesai,
+      lokasi: values.lokasi,
+      anggaran_diajukan: values.anggaran_diajukan,
+      status: "draft",
+    })
+    .select("id")
+    .single();
+  if (error) throw error;
+  return data;
+}
+
+export async function updateProposal({ id, values }) {
+  const { error } = await supabase
+    .from("proposals")
+    .update({
+      judul_kegiatan: values.judul_kegiatan,
+      deskripsi: values.deskripsi,
+      tujuan_kegiatan: values.tujuan_kegiatan,
+      tanggal_mulai: values.tanggal_mulai,
+      tanggal_selesai: values.tanggal_selesai,
+      lokasi: values.lokasi,
+      anggaran_diajukan: values.anggaran_diajukan,
+    })
+    .eq("id", id);
+  if (error) throw error;
+  return { id };
+}
+
+export async function submitProposal({ id }) {
+  const { data: userData, error: ue } = await supabase.auth.getUser();
+  if (ue) throw ue;
+  const actor = userData.user;
+  if (!actor) throw new Error("Sesi tidak valid");
+
+  const { error: pe } = await supabase
+    .from("proposals")
+    .update({ status: "diajukan" })
+    .eq("id", id);
+  if (pe) throw pe;
+
+  const { error: le } = await supabase.from("activity_logs").insert({
+    actor_id: actor.id,
+    actor_role: "ormawa",
+    action: "proposal.submit",
+    target_table: "proposals",
+    target_id: id,
+    metadata: {},
+  });
+  if (le) throw le;
+
+  return { id, status: "diajukan" };
+}

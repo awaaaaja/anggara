@@ -58,7 +58,7 @@ function actorName(r) {
               <SelectValue placeholder="Semua Peran" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Semua Peran</SelectItem>
+              <SelectItem value="all">Semua Peran</SelectItem>
               <SelectItem v-for="r in actorRoleOptions" :key="r" :value="r">
                 {{ actorRoleLabel[r] }}
               </SelectItem>
@@ -69,7 +69,7 @@ function actorName(r) {
               <SelectValue placeholder="Semua Aksi" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Semua Aksi</SelectItem>
+              <SelectItem value="all">Semua Aksi</SelectItem>
               <SelectItem v-for="a in activityActionOptions" :key="a" :value="a">
                 {{ activityActionLabel[a] }}
               </SelectItem>

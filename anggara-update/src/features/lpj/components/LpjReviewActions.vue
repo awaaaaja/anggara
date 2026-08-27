@@ -24,7 +24,7 @@ const props = defineProps({
 });
 
 const auth = useAuthStore();
-const review = useReviewLpj();
+const { mutate: reviewMutate, isPending } = useReviewLpj();
 const open = ref(null);
 
 const canReview = computed(
@@ -49,13 +49,13 @@ function onOpenChange(val) {
 }
 
 const onApprove = () => {
-  review.mutate(
+  reviewMutate(
     { id: props.lpj.id, action: "approve", catatan: null },
     { onSuccess: () => (open.value = null) },
   );
 };
 const onReject = submitReject((values) => {
-  review.mutate(
+  reviewMutate(
     { id: props.lpj.id, action: "reject", catatan: values.catatan },
     { onSuccess: () => (open.value = null) },
   );
@@ -64,10 +64,10 @@ const onReject = submitReject((values) => {
 
 <template>
   <div v-if="canReview" class="flex flex-wrap gap-2">
-    <Button variant="default" :disabled="review.isPending" @click="onApprove">
+    <Button variant="default" :disabled="isPending" @click="onApprove">
       <Check class="mr-1 size-4" /> Setujui LPJ
     </Button>
-    <Button variant="outline" :disabled="review.isPending" @click="openDialog('reject')">
+    <Button variant="outline" :disabled="isPending" @click="openDialog('reject')">
       <X class="mr-1 size-4" /> Tolak LPJ
     </Button>
 
@@ -95,12 +95,7 @@ const onReject = submitReject((values) => {
           <DialogClose as-child>
             <Button variant="outline">Batal</Button>
           </DialogClose>
-          <Button
-            type="submit"
-            form="lpj-reject-form"
-            variant="destructive"
-            :disabled="review.isPending"
-          >
+          <Button type="submit" form="lpj-reject-form" variant="destructive" :disabled="isPending">
             <X class="mr-1 size-4" /> Tolak
           </Button>
         </DialogFooter>

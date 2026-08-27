@@ -31,14 +31,14 @@ const router = useRouter();
 
 const searchInput = ref("");
 const search = useDebounce(searchInput, 300);
-const status = ref(props.initialStatus);
+const status = ref(props.initialStatus || "all");
 const page = ref(1);
 const pageSize = 10;
 
 const filters = computed(() => ({
   role: auth.role,
   ormawaId: auth.ormawaId,
-  status: status.value || undefined,
+  status: status.value !== "all" ? status.value : undefined,
   search: search.value || undefined,
   page: page.value,
   pageSize,
@@ -79,7 +79,7 @@ function goDetail(id) {
           <SelectValue placeholder="Semua status" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="">Semua status</SelectItem>
+          <SelectItem value="all">Semua status</SelectItem>
           <SelectItem v-for="s in statusOptions" :key="s" :value="s">{{
             lpjStatusLabel[s]
           }}</SelectItem>

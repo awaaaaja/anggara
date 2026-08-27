@@ -1,13 +1,10 @@
 import { createRouter, createWebHistory } from "vue-router";
-import RoutePlaceholder from "@/shared/components/RoutePlaceholder.vue";
 import AppShell from "@/app/AppShell.vue";
 import FoundationPreview from "@/shared/components/FoundationPreview.vue";
 import LoginPage from "@/features/auth/pages/LoginPage.vue";
 import { authGuard } from "@/router/guards/auth.guard";
 
-const Placeholder = RoutePlaceholder;
-
-// Route structure mirrors AGENTS.md §6. Pages are not implemented yet —
+// Route structure mirrors AGENTS.md §6.
 // they will be lazy-loaded per feature in later sprints.
 const routes = [
   { path: "/", redirect: "/login" },
@@ -49,15 +46,31 @@ const routes = [
         name: "mpm.budget",
         component: () => import("@/features/budgets/pages/MpmBudgetPage.vue"),
       },
-      { path: "ormawa", name: "mpm.ormawa", component: Placeholder },
+      {
+        path: "ormawa",
+        name: "mpm.ormawa",
+        component: () => import("@/features/ormawa/pages/OrmawaManagementPage.vue"),
+      },
       {
         path: "activity",
         name: "mpm.activity",
         component: () => import("@/features/activity-log/pages/ActivityLogPage.vue"),
       },
-      { path: "archive", name: "mpm.archive", component: Placeholder },
-      { path: "profile", name: "mpm.profile", component: Placeholder },
-      { path: "settings", name: "mpm.settings", component: Placeholder },
+      {
+        path: "archive",
+        name: "mpm.archive",
+        component: () => import("@/shared/pages/ArchivePage.vue"),
+      },
+      {
+        path: "profile",
+        name: "mpm.profile",
+        component: () => import("@/shared/pages/ProfilePage.vue"),
+      },
+      {
+        path: "settings",
+        name: "mpm.settings",
+        component: () => import("@/shared/pages/SettingsPage.vue"),
+      },
     ],
   },
 
@@ -71,14 +84,26 @@ const routes = [
         name: "lkpka.dashboard",
         component: () => import("@/features/dashboard/pages/LkpkaDashboardPage.vue"),
       },
-      { path: "reviews/proposals", name: "lkpka.reviews.proposals", component: Placeholder },
+      {
+        path: "reviews/proposals",
+        name: "lkpka.reviews.proposals",
+        component: () => import("@/features/proposals/pages/LkpkaProposalsPage.vue"),
+      },
       {
         path: "reviews/proposals/:id",
         name: "lkpka.reviews.proposals.detail",
-        component: Placeholder,
+        component: () => import("@/features/proposals/components/ProposalDetail.vue"),
       },
-      { path: "reviews/lpj", name: "lkpka.reviews.lpj", component: Placeholder },
-      { path: "reviews/lpj/:id", name: "lkpka.reviews.lpj.detail", component: Placeholder },
+      {
+        path: "reviews/lpj",
+        name: "lkpka.reviews.lpj",
+        component: () => import("@/features/lpj/pages/LkpkaLpjPage.vue"),
+      },
+      {
+        path: "reviews/lpj/:id",
+        name: "lkpka.reviews.lpj.detail",
+        component: () => import("@/features/lpj/components/LpjDetail.vue"),
+      },
       {
         path: "proposals",
         name: "lkpka.proposals",
@@ -99,15 +124,31 @@ const routes = [
         name: "lkpka.lpj.detail",
         component: () => import("@/features/lpj/components/LpjDetail.vue"),
       },
-      { path: "budget", name: "lkpka.budget", component: Placeholder },
+      {
+        path: "budget",
+        name: "lkpka.budget",
+        component: () => import("@/features/budgets/pages/MpmBudgetPage.vue"),
+      },
       {
         path: "activity",
         name: "lkpka.activity",
         component: () => import("@/features/activity-log/pages/ActivityLogPage.vue"),
       },
-      { path: "archive", name: "lkpka.archive", component: Placeholder },
-      { path: "profile", name: "lkpka.profile", component: Placeholder },
-      { path: "settings", name: "lkpka.settings", component: Placeholder },
+      {
+        path: "archive",
+        name: "lkpka.archive",
+        component: () => import("@/shared/pages/ArchivePage.vue"),
+      },
+      {
+        path: "profile",
+        name: "lkpka.profile",
+        component: () => import("@/shared/pages/ProfilePage.vue"),
+      },
+      {
+        path: "settings",
+        name: "lkpka.settings",
+        component: () => import("@/shared/pages/SettingsPage.vue"),
+      },
     ],
   },
 
@@ -129,14 +170,26 @@ const routes = [
             name: "ormawa.proposals",
             component: () => import("@/features/proposals/pages/OrmawaProposalsPage.vue"),
           },
-          { path: "new", name: "ormawa.proposals.new", component: Placeholder },
+          {
+            path: "new",
+            name: "ormawa.proposals.new",
+            component: () => import("@/features/proposals/pages/OrmawaProposalFormPage.vue"),
+          },
           {
             path: ":id",
             name: "ormawa.proposals.detail",
             component: () => import("@/features/proposals/components/ProposalDetail.vue"),
           },
-          { path: ":id/edit", name: "ormawa.proposals.edit", component: Placeholder },
-          { path: ":id/history", name: "ormawa.proposals.history", component: Placeholder },
+          {
+            path: ":id/edit",
+            name: "ormawa.proposals.edit",
+            component: () => import("@/features/proposals/pages/OrmawaProposalFormPage.vue"),
+          },
+          {
+            path: ":id/history",
+            name: "ormawa.proposals.history",
+            component: () => import("@/features/proposals/pages/OrmawaProposalHistoryPage.vue"),
+          },
         ],
       },
       {
@@ -152,12 +205,28 @@ const routes = [
             name: "ormawa.lpj.detail",
             component: () => import("@/features/lpj/components/LpjDetail.vue"),
           },
-          { path: ":id/edit", name: "ormawa.lpj.edit", component: Placeholder },
+          {
+            path: ":id/edit",
+            name: "ormawa.lpj.edit",
+            component: () => import("@/features/lpj/pages/OrmawaLpjEditPage.vue"),
+          },
         ],
       },
-      { path: "archive", name: "ormawa.archive", component: Placeholder },
-      { path: "profile", name: "ormawa.profile", component: Placeholder },
-      { path: "settings", name: "ormawa.settings", component: Placeholder },
+      {
+        path: "archive",
+        name: "ormawa.archive",
+        component: () => import("@/shared/pages/ArchivePage.vue"),
+      },
+      {
+        path: "profile",
+        name: "ormawa.profile",
+        component: () => import("@/shared/pages/ProfilePage.vue"),
+      },
+      {
+        path: "settings",
+        name: "ormawa.settings",
+        component: () => import("@/shared/pages/SettingsPage.vue"),
+      },
     ],
   },
 ];

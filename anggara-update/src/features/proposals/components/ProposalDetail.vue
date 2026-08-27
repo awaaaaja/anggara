@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { ArrowLeft } from "lucide-vue-next";
 import { Badge } from "@/shared/components/ui/badge";
@@ -9,11 +9,13 @@ import EmptyState from "@/shared/components/EmptyState.vue";
 import ErrorState from "@/shared/components/ErrorState.vue";
 import { formatRupiah, formatDate } from "@/shared/lib/format";
 import { proposalStatusLabel, proposalStatusVariant } from "@/shared/lib/status";
-import { useProposal } from "@/features/proposals/composables/useProposals";
+import { useProposal, useSubmitProposal } from "@/features/proposals/composables/useProposals";
 import ReviewActions from "@/features/proposals/components/ReviewActions.vue";
+import { useAuthStore } from "@/stores/auth";
 
 const route = useRoute();
 const router = useRouter();
+const auth = useAuthStore();
 const id = computed(() => route.params.id);
 
 const { data, isLoading, isError, error, refetch } = useProposal(id);
@@ -21,6 +23,25 @@ const p = computed(() => data.value);
 
 const anggaran = computed(() => p.value?.anggaran?.[0] || null);
 const revisions = computed(() => p.value?.proposal_revisions || []);
+
+const canSubmit = computed(
+  () =>
+    auth.role === "ormawa" &&
+    p.value &&
+    (p.value.status === "draft" || p.value.status === "revisi_diminta"),
+);
+
+const submit = useSubmitProposal();
+const submitting = ref(false);
+async function onAjukan() {
+  submitting.value = true;
+  try {
+    await submit.mutateAsync(id.value);
+    refetch();
+  } finally {
+    submitting.value = false;
+  }
+}
 </script>
 
 <template>
@@ -56,6 +77,17 @@ const revisions = computed(() => p.value?.proposal_revisions || []);
           <span v-if="p.ormawa?.jenis"> · {{ p.ormawa.jenis }}</span>
         </p>
         <ReviewActions :proposal="p" />
+        <div v-if="canSubmit" class="flex flex-wrap gap-2">
+          <Button variant="default" :disabled="submitting" @click="onAjukan">Ajukan</Button>
+          <Button
+            variant="outline"
+            @click="router.push(`/ormawa/proposals/${id}/edit`)"
+            >Edit</Button
+          >
+          <Button variant="ghost" @click="router.push(`/ormawa/proposals/${id}/history`)"
+            >Riwayat Revisi</Button
+          >
+        </div>
       </header>
 
       <div class="grid grid-cols-1 gap-4 lg:grid-cols-3">

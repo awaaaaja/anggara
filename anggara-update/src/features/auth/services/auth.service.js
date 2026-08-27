@@ -30,3 +30,15 @@ export async function getProfile(userId) {
 export function onAuthChange(callback) {
   return supabase.auth.onAuthStateChange((event, session) => callback(event, session));
 }
+
+export async function updateProfile({ fullName, logoUrl }) {
+  const { data: userData, error: ue } = await supabase.auth.getUser();
+  if (ue) throw ue;
+  if (!userData.user) throw new Error("Sesi tidak valid");
+  const patch = {};
+  if (fullName !== undefined) patch.full_name = fullName;
+  if (logoUrl !== undefined) patch.logo_url = logoUrl;
+  const { error } = await supabase.from("profiles").update(patch).eq("id", userData.user.id);
+  if (error) throw error;
+  return { id: userData.user.id };
+}

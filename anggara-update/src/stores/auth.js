@@ -6,6 +6,7 @@ import {
   getSession,
   getProfile,
   onAuthChange,
+  updateProfile,
 } from "@/features/auth/services/auth.service";
 
 // Client auth state (AGENTS.md §4). Session persistence is handled by the
@@ -71,6 +72,13 @@ export const useAuthStore = defineStore("auth", () => {
     reset();
   }
 
+  async function saveProfile({ fullName, logoUrl }) {
+    await updateProfile({ fullName, logoUrl });
+    if (fullName !== undefined) fullNameRef.value = fullName;
+  }
+
+  const fullNameRef = fullName;
+
   return {
     user,
     role,
@@ -82,5 +90,6 @@ export const useAuthStore = defineStore("auth", () => {
     init,
     login,
     logout,
+    saveProfile,
   };
 });

@@ -3,8 +3,8 @@ import { useQuery } from "@tanstack/vue-query";
 import { listActivity } from "@/features/activity-log/services/activity.service";
 
 export function useActivity() {
-  const actorRole = ref("");
-  const action = ref("");
+  const actorRole = ref("all");
+  const action = ref("all");
   const search = ref("");
   const page = ref(1);
   const pageSize = 15;
@@ -13,8 +13,8 @@ export function useActivity() {
     queryKey: computed(() => ["activity", actorRole.value, action.value, search.value, page.value]),
     queryFn: () =>
       listActivity({
-        actorRole: actorRole.value || undefined,
-        action: action.value || undefined,
+        actorRole: actorRole.value !== "all" ? actorRole.value : undefined,
+        action: action.value !== "all" ? action.value : undefined,
         search: search.value || undefined,
         page: page.value,
         pageSize,

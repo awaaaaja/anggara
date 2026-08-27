@@ -74,3 +74,38 @@ export async function reviewLpj({ id, action, catatan, actorRole }) {
 
   return { status: newStatus };
 }
+
+export async function updateLpj({ id, values }) {
+  const { error } = await supabase
+    .from("lpj")
+    .update({
+      ringkasan_penggunaan_dana: values.ringkasan_penggunaan_dana,
+      rincian_pengeluaran: values.rincian_pengeluaran,
+      total_realisasi: values.total_realisasi,
+    })
+    .eq("id", id);
+  if (error) throw error;
+  return { id };
+}
+
+export async function submitLpj({ id }) {
+  const { data: userData, error: ue } = await supabase.auth.getUser();
+  if (ue) throw ue;
+  const actor = userData.user;
+  if (!actor) throw new Error("Sesi tidak valid");
+
+  const { error: le } = await supabase.from("lpj").update({ status: "menunggu" }).eq("id", id);
+  if (le) throw le;
+
+  const { error: ae } = await supabase.from("activity_logs").insert({
+    actor_id: actor.id,
+    actor_role: "ormawa",
+    action: "lpj.submit",
+    target_table: "lpj",
+    target_id: id,
+    metadata: {},
+  });
+  if (ae) throw ae;
+
+  return { id, status: "menunggu" };
+}

@@ -25,10 +25,11 @@ export function useLkpkaDashboard() {
 }
 
 export function useOrmawaDashboard(ormawaId) {
+  const id = toValue(ormawaId);
   return useQuery({
-    queryKey: ["dashboard", "ormawa", ormawaId],
-    queryFn: () => getOrmawaDashboard(toValue(ormawaId)),
-    enabled: ormawaId,
+    queryKey: ["dashboard", "ormawa", id],
+    queryFn: () => getOrmawaDashboard(id),
+    enabled: !!id,
     staleTime: 30_000,
   });
 }
