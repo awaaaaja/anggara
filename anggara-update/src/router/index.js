@@ -34,7 +34,16 @@ const routes = [
         name: "mpm.proposals.detail",
         component: () => import("@/features/proposals/components/ProposalDetail.vue"),
       },
-      { path: "lpj", name: "mpm.lpj", component: Placeholder },
+      {
+        path: "lpj",
+        name: "mpm.lpj",
+        component: () => import("@/features/lpj/pages/MpmLpjPage.vue"),
+      },
+      {
+        path: "lpj/:id",
+        name: "mpm.lpj.detail",
+        component: () => import("@/features/lpj/components/LpjDetail.vue"),
+      },
       { path: "budget", name: "mpm.budget", component: Placeholder },
       { path: "ormawa", name: "mpm.ormawa", component: Placeholder },
       { path: "activity", name: "mpm.activity", component: Placeholder },
@@ -72,8 +81,16 @@ const routes = [
         name: "lkpka.proposals.detail",
         component: () => import("@/features/proposals/components/ProposalDetail.vue"),
       },
-      { path: "lpj", name: "lkpka.lpj", component: Placeholder },
-      { path: "lpj/:id", name: "lkpka.lpj.detail", component: Placeholder },
+      {
+        path: "lpj",
+        name: "lkpka.lpj",
+        component: () => import("@/features/lpj/pages/LkpkaLpjPage.vue"),
+      },
+      {
+        path: "lpj/:id",
+        name: "lkpka.lpj.detail",
+        component: () => import("@/features/lpj/components/LpjDetail.vue"),
+      },
       { path: "budget", name: "lkpka.budget", component: Placeholder },
       { path: "archive", name: "lkpka.archive", component: Placeholder },
       { path: "profile", name: "lkpka.profile", component: Placeholder },
@@ -112,8 +129,16 @@ const routes = [
       {
         path: "lpj",
         children: [
-          { path: "", name: "ormawa.lpj", component: Placeholder },
-          { path: ":id", name: "ormawa.lpj.detail", component: Placeholder },
+          {
+            path: "",
+            name: "ormawa.lpj",
+            component: () => import("@/features/lpj/pages/OrmawaLpjPage.vue"),
+          },
+          {
+            path: ":id",
+            name: "ormawa.lpj.detail",
+            component: () => import("@/features/lpj/components/LpjDetail.vue"),
+          },
           { path: ":id/edit", name: "ormawa.lpj.edit", component: Placeholder },
         ],
       },

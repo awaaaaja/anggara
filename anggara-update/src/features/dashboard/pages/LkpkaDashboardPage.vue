@@ -13,7 +13,10 @@ import {
   lpjStatusLabel,
   lpjStatusVariant,
 } from "@/shared/lib/status";
+import { useRouter } from "vue-router";
 import { useLkpkaDashboard } from "@/features/dashboard/composables/useDashboard";
+
+const router = useRouter();
 
 const { data, isLoading, isError, error, refetch } = useLkpkaDashboard();
 </script>
@@ -116,7 +119,8 @@ const { data, isLoading, isError, error, refetch } = useLkpkaDashboard();
               <tr
                 v-for="l in data.lpjReview"
                 :key="l.id"
-                class="border-b border-border last:border-0"
+                class="cursor-pointer border-b border-border last:border-0 hover:bg-surface-secondary"
+                @click="router.push(`/lkpka/lpj/${l.id}`)"
               >
                 <td class="px-4 py-3 font-medium text-text">
                   {{ l.proposal?.judul_kegiatan || "-" }}
