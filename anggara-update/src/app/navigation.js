@@ -61,7 +61,10 @@ export const navByRole = {
     },
     {
       section: "Monitoring",
-      items: [{ label: "Budget", to: "/lkpka/budget", icon: Wallet }],
+      items: [
+        { label: "Budget", to: "/lkpka/budget", icon: Wallet },
+        { label: "Activity", to: "/lkpka/activity", icon: ListChecks },
+      ],
     },
     {
       section: "System",
