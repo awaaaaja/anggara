@@ -44,7 +44,11 @@ const routes = [
         name: "mpm.lpj.detail",
         component: () => import("@/features/lpj/components/LpjDetail.vue"),
       },
-      { path: "budget", name: "mpm.budget", component: Placeholder },
+      {
+        path: "budget",
+        name: "mpm.budget",
+        component: () => import("@/features/budgets/pages/MpmBudgetPage.vue"),
+      },
       { path: "ormawa", name: "mpm.ormawa", component: Placeholder },
       { path: "activity", name: "mpm.activity", component: Placeholder },
       { path: "archive", name: "mpm.archive", component: Placeholder },
