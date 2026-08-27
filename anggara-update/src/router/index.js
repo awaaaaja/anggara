@@ -19,7 +19,11 @@ const routes = [
     component: AppShell,
     children: [
       { path: "", redirect: { name: "mpm.dashboard" } },
-      { path: "dashboard", name: "mpm.dashboard", component: Placeholder },
+      {
+        path: "dashboard",
+        name: "mpm.dashboard",
+        component: () => import("@/features/dashboard/pages/MpmDashboardPage.vue"),
+      },
       { path: "proposals", name: "mpm.proposals", component: Placeholder },
       { path: "lpj", name: "mpm.lpj", component: Placeholder },
       { path: "budget", name: "mpm.budget", component: Placeholder },
@@ -36,7 +40,11 @@ const routes = [
     component: AppShell,
     children: [
       { path: "", redirect: { name: "lkpka.dashboard" } },
-      { path: "dashboard", name: "lkpka.dashboard", component: Placeholder },
+      {
+        path: "dashboard",
+        name: "lkpka.dashboard",
+        component: () => import("@/features/dashboard/pages/LkpkaDashboardPage.vue"),
+      },
       { path: "reviews/proposals", name: "lkpka.reviews.proposals", component: Placeholder },
       {
         path: "reviews/proposals/:id",
@@ -61,7 +69,11 @@ const routes = [
     component: AppShell,
     children: [
       { path: "", redirect: { name: "ormawa.dashboard" } },
-      { path: "dashboard", name: "ormawa.dashboard", component: Placeholder },
+      {
+        path: "dashboard",
+        name: "ormawa.dashboard",
+        component: () => import("@/features/dashboard/pages/OrmawaDashboardPage.vue"),
+      },
       {
         path: "proposals",
         children: [
