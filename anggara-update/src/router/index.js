@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
 import RoutePlaceholder from "@/shared/components/RoutePlaceholder.vue";
-import LayoutShell from "@/shared/components/LayoutShell.vue";
+import AppShell from "@/app/AppShell.vue";
 import FoundationPreview from "@/shared/components/FoundationPreview.vue";
 
 const Placeholder = RoutePlaceholder;
@@ -14,7 +14,7 @@ const routes = [
 
   {
     path: "/mpm",
-    component: LayoutShell,
+    component: AppShell,
     children: [
       { path: "", redirect: { name: "mpm.dashboard" } },
       { path: "dashboard", name: "mpm.dashboard", component: Placeholder },
@@ -31,7 +31,7 @@ const routes = [
 
   {
     path: "/lkpka",
-    component: LayoutShell,
+    component: AppShell,
     children: [
       { path: "", redirect: { name: "lkpka.dashboard" } },
       { path: "dashboard", name: "lkpka.dashboard", component: Placeholder },
@@ -56,7 +56,7 @@ const routes = [
 
   {
     path: "/ormawa",
-    component: LayoutShell,
+    component: AppShell,
     children: [
       { path: "", redirect: { name: "ormawa.dashboard" } },
       { path: "dashboard", name: "ormawa.dashboard", component: Placeholder },
