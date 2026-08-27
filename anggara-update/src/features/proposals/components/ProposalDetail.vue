@@ -10,6 +10,7 @@ import ErrorState from "@/shared/components/ErrorState.vue";
 import { formatRupiah, formatDate } from "@/shared/lib/format";
 import { proposalStatusLabel, proposalStatusVariant } from "@/shared/lib/status";
 import { useProposal } from "@/features/proposals/composables/useProposals";
+import ReviewActions from "@/features/proposals/components/ReviewActions.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -54,6 +55,7 @@ const revisions = computed(() => p.value?.proposal_revisions || []);
           {{ p.ormawa?.nama || "-" }}
           <span v-if="p.ormawa?.jenis"> · {{ p.ormawa.jenis }}</span>
         </p>
+        <ReviewActions :proposal="p" />
       </header>
 
       <div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
