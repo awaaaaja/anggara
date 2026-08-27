@@ -2,6 +2,8 @@ import { createRouter, createWebHistory } from "vue-router";
 import RoutePlaceholder from "@/shared/components/RoutePlaceholder.vue";
 import AppShell from "@/app/AppShell.vue";
 import FoundationPreview from "@/shared/components/FoundationPreview.vue";
+import LoginPage from "@/features/auth/pages/LoginPage.vue";
+import { authGuard } from "@/router/guards/auth.guard";
 
 const Placeholder = RoutePlaceholder;
 
@@ -9,7 +11,7 @@ const Placeholder = RoutePlaceholder;
 // they will be lazy-loaded per feature in later sprints.
 const routes = [
   { path: "/", redirect: "/login" },
-  { path: "/login", name: "login", component: Placeholder },
+  { path: "/login", name: "login", component: LoginPage },
   { path: "/foundation", name: "foundation", component: FoundationPreview },
 
   {
@@ -90,5 +92,5 @@ export const router = createRouter({
   routes,
 });
 
-// Role-based navigation guard is implemented in Sprint 04.
-// router.beforeEach(authGuard)
+// Role-based navigation guard (Sprint 04).
+router.beforeEach(authGuard);
