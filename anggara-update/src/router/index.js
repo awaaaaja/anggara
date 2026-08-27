@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
 import RoutePlaceholder from "@/shared/components/RoutePlaceholder.vue";
 import LayoutShell from "@/shared/components/LayoutShell.vue";
+import FoundationPreview from "@/shared/components/FoundationPreview.vue";
 
 const Placeholder = RoutePlaceholder;
 
@@ -9,6 +10,7 @@ const Placeholder = RoutePlaceholder;
 const routes = [
   { path: "/", redirect: "/login" },
   { path: "/login", name: "login", component: Placeholder },
+  { path: "/foundation", name: "foundation", component: FoundationPreview },
 
   {
     path: "/mpm",
