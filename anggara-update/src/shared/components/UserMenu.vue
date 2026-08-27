@@ -1,4 +1,5 @@
 <script setup>
+import { computed } from "vue";
 import { Avatar, AvatarFallback } from "@/shared/components/ui/avatar";
 import {
   DropdownMenu,
@@ -8,13 +9,33 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/shared/components/ui/dropdown-menu";
-import { useRoute } from "vue-router";
-import { roleFromPath, roleLabels } from "@/app/navigation";
+import { useRouter } from "vue-router";
+import { useAuthStore } from "@/stores/auth";
+import { roleLabels } from "@/app/navigation";
 import { LogOut, User, Settings } from "lucide-vue-next";
 
-const route = useRoute();
-const role = roleFromPath(route.path);
-const initials = "MP"; // placeholder until auth lands in Sprint 04
+const router = useRouter();
+const auth = useAuthStore();
+
+const initials = computed(() => {
+  const name = auth.fullName?.trim();
+  if (name) {
+    return name
+      .split(/\s+/)
+      .map((w) => w[0])
+      .slice(0, 2)
+      .join("")
+      .toUpperCase();
+  }
+  return auth.role ? auth.role[0].toUpperCase() : "U";
+});
+
+const displayName = computed(() => auth.fullName || roleLabels[auth.role] || "User");
+
+async function onLogout() {
+  await auth.logout();
+  router.push("/login");
+}
 </script>
 
 <template>
@@ -28,17 +49,15 @@ const initials = "MP"; // placeholder until auth lands in Sprint 04
           initials
         }}</AvatarFallback>
       </Avatar>
-      <span class="hidden text-sm font-medium text-text sm:inline">{{
-        roleLabels[role] || "User"
-      }}</span>
+      <span class="hidden text-sm font-medium text-text sm:inline">{{ displayName }}</span>
     </DropdownMenuTrigger>
     <DropdownMenuContent align="end" class="w-48">
-      <DropdownMenuLabel>Akun</DropdownMenuLabel>
+      <DropdownMenuLabel>{{ displayName }}</DropdownMenuLabel>
       <DropdownMenuSeparator />
       <DropdownMenuItem> <User class="mr-2 size-4" /> Profile </DropdownMenuItem>
       <DropdownMenuItem> <Settings class="mr-2 size-4" /> Settings </DropdownMenuItem>
       <DropdownMenuSeparator />
-      <DropdownMenuItem class="text-danger focus:text-danger">
+      <DropdownMenuItem class="text-danger focus:text-danger" @select="onLogout">
         <LogOut class="mr-2 size-4" /> Logout
       </DropdownMenuItem>
     </DropdownMenuContent>
