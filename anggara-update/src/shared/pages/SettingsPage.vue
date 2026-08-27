@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch } from "vue";
 import { useAuthStore } from "@/stores/auth";
 import { roleLabels } from "@/app/navigation";
 import { Moon, Sun } from "lucide-vue-next";
@@ -23,11 +23,10 @@ function applyTheme() {
   localStorage.setItem("anggara-theme", dark.value ? "dark" : "light");
 }
 
-function toggleTheme() {
-  dark.value = !dark.value;
+watch(dark, () => {
   applyTheme();
   toast.success(dark.value ? "Mode gelap aktif" : "Mode terang aktif");
-}
+});
 
 function logout() {
   auth.logout();
@@ -52,7 +51,7 @@ function logout() {
             </p>
           </div>
         </div>
-        <Switch :checked="dark" @update:checked="toggleTheme" />
+        <Switch v-model="dark" />
       </div>
 
       <div class="border-t border-border pt-4">

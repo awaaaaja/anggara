@@ -79,9 +79,7 @@ async function onAjukan() {
         <ReviewActions :proposal="p" />
         <div v-if="canSubmit" class="flex flex-wrap gap-2">
           <Button variant="default" :disabled="submitting" @click="onAjukan">Ajukan</Button>
-          <Button
-            variant="outline"
-            @click="router.push(`/ormawa/proposals/${id}/edit`)"
+          <Button variant="outline" @click="router.push(`/ormawa/proposals/${id}/edit`)"
             >Edit</Button
           >
           <Button variant="ghost" @click="router.push(`/ormawa/proposals/${id}/history`)"

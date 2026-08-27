@@ -28,7 +28,7 @@ const { data, isLoading, isError, error, refetch, search, page, total, rows, tot
   useOrmawas();
 const searchInput = ref("");
 const debounced = useDebounce(searchInput, 300);
-search.value = debounced;
+search.value = debounced.value;
 
 const dialogOpen = ref(false);
 const editing = ref(null);

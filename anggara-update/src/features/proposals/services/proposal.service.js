@@ -73,13 +73,16 @@ export async function reviewProposal({ id, action, nominal, catatan }) {
   if (pe) throw pe;
 
   if (action === "approve") {
-    const { error: ae } = await supabase.from("anggaran").insert({
-      proposal_id: id,
-      nominal_disetujui: nominal,
-      catatan_anggaran: catatan || null,
-      ditetapkan_oleh: actor.id,
-      ditetapkan_pada: now,
-    });
+    const { error: ae } = await supabase.from("anggaran").upsert(
+      {
+        proposal_id: id,
+        nominal_disetujui: nominal,
+        catatan_anggaran: catatan || null,
+        ditetapkan_oleh: actor.id,
+        ditetapkan_pada: now,
+      },
+      { onConflict: "proposal_id" },
+    );
     if (ae) throw ae;
   }
 
