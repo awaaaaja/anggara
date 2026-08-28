@@ -9,8 +9,10 @@ import EmptyState from "@/shared/components/EmptyState.vue";
 import ErrorState from "@/shared/components/ErrorState.vue";
 import { formatRupiah, formatDate } from "@/shared/lib/format";
 import { lpjStatusLabel, lpjStatusVariant } from "@/shared/lib/status";
+import { ref, watch } from "vue";
 import { useLpj } from "@/features/lpj/composables/useLpj";
 import LpjReviewActions from "@/features/lpj/components/LpjReviewActions.vue";
+import { getSignedUrl, toStoragePath, BUCKETS } from "@/services/storage.service";
 
 const route = useRoute();
 const router = useRouter();
@@ -24,6 +26,26 @@ const anggaranDisetujui = computed(
 );
 const rincian = computed(() => lpj.value?.rincian_pengeluaran || []);
 const dokumentasi = computed(() => lpj.value?.dokumentasi_kegiatan || []);
+
+// Resolve signed URLs for the now-private dokumentasi bucket.
+const dokumentasiSigned = ref([]);
+watch(
+  dokumentasi,
+  async (list) => {
+    dokumentasiSigned.value = await Promise.all(
+      (list || []).map(async (d) => {
+        let signedUrl = null;
+        try {
+          signedUrl = await getSignedUrl(BUCKETS.DOKUMENTASI, toStoragePath(d.file_url));
+        } catch {
+          signedUrl = null;
+        }
+        return { ...d, signedUrl };
+      }),
+    );
+  },
+  { immediate: true },
+);
 </script>
 
 <template>
@@ -129,27 +151,30 @@ const dokumentasi = computed(() => lpj.value?.dokumentasi_kegiatan || []);
       <!-- Documentation gallery -->
       <section>
         <h2 class="mb-3 text-sm font-semibold text-text">Dokumentasi Kegiatan</h2>
-        <div v-if="dokumentasi.length" class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+        <div
+          v-if="dokumentasiSigned.length"
+          class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4"
+        >
           <div
-            v-for="d in dokumentasi"
+            v-for="d in dokumentasiSigned"
             :key="d.id"
             class="overflow-hidden rounded-lg border border-border bg-surface"
           >
             <img
               v-if="d.file_type === 'foto'"
-              :src="d.file_url"
+              :src="d.signedUrl"
               :alt="d.caption || 'Dokumentasi'"
               class="aspect-square w-full object-cover"
             />
             <video
               v-else-if="d.file_type === 'video'"
-              :src="d.file_url"
+              :src="d.signedUrl"
               controls
               class="aspect-square w-full object-cover"
             />
             <a
               v-else
-              :href="d.file_url"
+              :href="d.signedUrl"
               target="_blank"
               rel="noreferrer"
               class="flex aspect-square w-full items-center justify-center bg-surface-secondary p-3 text-center text-xs text-text-muted"
@@ -161,7 +186,9 @@ const dokumentasi = computed(() => lpj.value?.dokumentasi_kegiatan || []);
             </p>
           </div>
         </div>
-        <p v-else class="text-sm text-text-muted">Belum ada dokumentasi.</p>
+        <p v-else-if="!dokumentasi.length" class="text-sm text-text-muted">
+          Belum ada dokumentasi.
+        </p>
       </section>
     </template>
   </div>
