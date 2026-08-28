@@ -1,4 +1,5 @@
 import { supabase } from "@/services/supabase";
+import { assertRole } from "@/services/rbac";
 
 export async function listProposals({
   role,
@@ -53,10 +54,7 @@ const REVIEW_ACTION = {
 // budget (anggaran), and writes an immutable activity_log row. Sequential
 // client calls within the user's session (RLS enforces role scope).
 export async function reviewProposal({ id, action, nominal, catatan }) {
-  const { data: userData, error: ue } = await supabase.auth.getUser();
-  if (ue) throw ue;
-  const actor = userData.user;
-  if (!actor) throw new Error("Sesi tidak valid");
+  const actor = await assertRole(["lkpka"]);
 
   const now = new Date().toISOString();
   const newStatus = REVIEW_STATUS[action];
@@ -103,6 +101,7 @@ export async function reviewProposal({ id, action, nominal, catatan }) {
 }
 
 export async function createProposal({ ormawaId, values }) {
+  await assertRole(["ormawa"]);
   const { data, error } = await supabase
     .from("proposals")
     .insert({
@@ -123,6 +122,7 @@ export async function createProposal({ ormawaId, values }) {
 }
 
 export async function updateProposal({ id, values }) {
+  await assertRole(["ormawa"]);
   const { error } = await supabase
     .from("proposals")
     .update({
@@ -140,10 +140,7 @@ export async function updateProposal({ id, values }) {
 }
 
 export async function submitProposal({ id }) {
-  const { data: userData, error: ue } = await supabase.auth.getUser();
-  if (ue) throw ue;
-  const actor = userData.user;
-  if (!actor) throw new Error("Sesi tidak valid");
+  const actor = await assertRole(["ormawa"]);
 
   const { error: pe } = await supabase
     .from("proposals")

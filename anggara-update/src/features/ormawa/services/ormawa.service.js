@@ -1,4 +1,5 @@
 import { supabase } from "@/services/supabase";
+import { assertRole } from "@/services/rbac";
 
 export async function listOrmawa({ search, page = 1, pageSize = 10 } = {}) {
   let q = supabase
@@ -24,6 +25,7 @@ export async function getOrmawa(id) {
 }
 
 export async function createOrmawa(payload) {
+  await assertRole(["mpm"]);
   const { data, error } = await supabase
     .from("ormawa")
     .insert({
@@ -39,6 +41,7 @@ export async function createOrmawa(payload) {
 }
 
 export async function updateOrmawa(id, payload) {
+  await assertRole(["mpm"]);
   const { error } = await supabase
     .from("ormawa")
     .update({
@@ -53,6 +56,7 @@ export async function updateOrmawa(id, payload) {
 }
 
 export async function deleteOrmawa(id) {
+  await assertRole(["mpm"]);
   const { error } = await supabase.from("ormawa").delete().eq("id", id);
   if (error) throw error;
   return { id };

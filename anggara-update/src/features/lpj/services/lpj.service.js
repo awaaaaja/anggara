@@ -1,4 +1,5 @@
 import { supabase } from "@/services/supabase";
+import { assertRole } from "@/services/rbac";
 
 export async function listLpj({ role, ormawaId, status, search, page = 1, pageSize = 10 } = {}) {
   let q = supabase
@@ -42,11 +43,8 @@ const LPJ_ACTION = {
 
 // LKPKA/MPM review of an LPJ. Updates status + review fields and writes an
 // immutable activity_log row. No budget change (anggaran belongs to proposal).
-export async function reviewLpj({ id, action, catatan, actorRole }) {
-  const { data: userData, error: ue } = await supabase.auth.getUser();
-  if (ue) throw ue;
-  const actor = userData.user;
-  if (!actor) throw new Error("Sesi tidak valid");
+export async function reviewLpj({ id, action, catatan }) {
+  const actor = await assertRole(["lkpka", "mpm"]);
 
   const now = new Date().toISOString();
   const newStatus = LPJ_STATUS[action];
@@ -64,7 +62,7 @@ export async function reviewLpj({ id, action, catatan, actorRole }) {
 
   const { error: ae } = await supabase.from("activity_logs").insert({
     actor_id: actor.id,
-    actor_role: actorRole,
+    actor_role: actor.role,
     action: LPJ_ACTION[action],
     target_table: "lpj",
     target_id: id,
@@ -76,6 +74,7 @@ export async function reviewLpj({ id, action, catatan, actorRole }) {
 }
 
 export async function updateLpj({ id, values }) {
+  await assertRole(["ormawa"]);
   const { error } = await supabase
     .from("lpj")
     .update({
@@ -89,10 +88,7 @@ export async function updateLpj({ id, values }) {
 }
 
 export async function submitLpj({ id }) {
-  const { data: userData, error: ue } = await supabase.auth.getUser();
-  if (ue) throw ue;
-  const actor = userData.user;
-  if (!actor) throw new Error("Sesi tidak valid");
+  const actor = await assertRole(["ormawa"]);
 
   const { error: le } = await supabase.from("lpj").update({ status: "menunggu" }).eq("id", id);
   if (le) throw le;
